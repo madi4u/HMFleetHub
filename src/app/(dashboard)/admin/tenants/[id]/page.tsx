@@ -57,7 +57,7 @@ function getRoleLabel(role: UserRole): string {
     SUPERADMIN: "Superadmin",
     TENANT_ADMIN: "Mandanten-Admin",
     FLEET_MANAGER: "Fuhrparkleiter",
-    OFFICE_USER: "Bueroanwender",
+    OFFICE_USER: "Büroanwender",
     WORKSHOP_MECHANIC: "Werkstattmitarbeiter",
     READ_ONLY: "Nur Lesen",
   }
@@ -146,7 +146,7 @@ export default function TenantDetailPage() {
         <Button variant="ghost" asChild className="-ml-4">
           <Link href="/admin/tenants">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Zurueck zur Uebersicht
+            Zurück zur Übersicht
           </Link>
         </Button>
         <Alert variant="destructive">
@@ -166,7 +166,7 @@ export default function TenantDetailPage() {
       <Button variant="ghost" asChild className="-ml-4">
         <Link href="/admin/tenants">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Zurueck zur Uebersicht
+          Zurück zur Übersicht
         </Link>
       </Button>
 
@@ -188,7 +188,7 @@ export default function TenantDetailPage() {
       {/* Tabs */}
       <Tabs defaultValue="overview">
         <TabsList>
-          <TabsTrigger value="overview">Uebersicht</TabsTrigger>
+          <TabsTrigger value="overview">Übersicht</TabsTrigger>
           <TabsTrigger value="users">
             Benutzer ({users.length})
           </TabsTrigger>
@@ -354,7 +354,7 @@ export default function TenantDetailPage() {
                 <Users className="mb-4 h-12 w-12 text-muted-foreground/50" />
                 <p className="text-lg font-medium">Keine Benutzer</p>
                 <p className="text-sm text-muted-foreground">
-                  Laden Sie den ersten Admin fuer diesen Mandanten ein.
+                  Laden Sie den ersten Admin für diesen Mandanten ein.
                 </p>
               </CardContent>
             </Card>

@@ -32,7 +32,7 @@ const tenantFormSchema = z.object({
     ),
   contact_email: z
     .string()
-    .email("Bitte geben Sie eine gueltige E-Mail-Adresse ein.")
+    .email("Bitte geben Sie eine gültige E-Mail-Adresse ein.")
     .or(z.literal(""))
     .optional(),
   address: z.string().optional(),
@@ -206,7 +206,7 @@ export function TenantForm({
               <FormLabel>Adresse</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Strasse, PLZ Ort"
+                  placeholder="Straße, PLZ Ort"
                   disabled={isSubmitting}
                   aria-label="Adresse"
                   rows={3}

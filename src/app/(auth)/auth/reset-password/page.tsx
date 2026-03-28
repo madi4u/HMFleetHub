@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card"
 
 export const metadata: Metadata = {
-  title: "Passwort zuruecksetzen | H+M FleetHub",
+  title: "Passwort zurücksetzen | H+M FleetHub",
   description: "Setzen Sie ein neues Passwort.",
 }
 

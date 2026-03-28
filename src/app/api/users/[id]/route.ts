@@ -18,7 +18,7 @@ const patchSchema = z
           "WORKSHOP_MECHANIC",
           "READ_ONLY",
         ] as const,
-        { message: "Ungueltige Rolle" }
+        { message: "Ungültige Rolle" }
       )
       .optional(),
     is_active: z.boolean().optional(),
@@ -56,7 +56,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     // Validate UUID format
     if (!z.string().uuid().safeParse(targetUserId).success) {
       return NextResponse.json(
-        { error: "Ungueltige Benutzer-ID" },
+        { error: "Ungültige Benutzer-ID" },
         { status: 400 }
       )
     }
@@ -72,7 +72,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       return NextResponse.json(
         {
           error:
-            "Sie koennen Ihre eigene Rolle nicht aendern oder sich selbst deaktivieren.",
+            "Sie können Ihre eigene Rolle nicht ändern oder sich selbst deaktivieren.",
         },
         { status: 400 }
       )
@@ -84,7 +84,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       body = await request.json()
     } catch {
       return NextResponse.json(
-        { error: "Ungueltiger Request-Body" },
+        { error: "Ungültiger Request-Body" },
         { status: 400 }
       )
     }
@@ -121,7 +121,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       return NextResponse.json(
         {
           error:
-            "SUPERADMIN-Rolle kann ueber diesen Endpunkt nicht vergeben werden.",
+            "SUPERADMIN-Rolle kann über diesen Endpunkt nicht vergeben werden.",
         },
         { status: 403 }
       )
@@ -143,7 +143,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
       if (countError) {
         return NextResponse.json(
-          { error: "Fehler bei der Berechtigungspruefung." },
+          { error: "Fehler bei der Berechtigungsprüfung." },
           { status: 500 }
         )
       }

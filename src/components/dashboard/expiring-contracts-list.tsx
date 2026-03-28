@@ -44,13 +44,13 @@ export function ExpiringContractsList({ items }: ExpiringContractsListProps) {
     <Card>
       <CardHeader>
         <CardTitle className="text-base">
-          Bald endende Vertraege (60 Tage)
+          Bald endende Verträge (60 Tage)
         </CardTitle>
       </CardHeader>
       <CardContent>
         {items.length === 0 ? (
           <p className="text-sm text-muted-foreground py-4 text-center">
-            Keine Vertraege laufen in den naechsten 60 Tagen aus.
+            Keine Verträge laufen in den nächsten 60 Tagen aus.
           </p>
         ) : (
           <div className="overflow-x-auto">

@@ -49,7 +49,7 @@ export function VehiclePhoto({
         sizeClasses[size],
         className
       )}
-      aria-label={`Kein Bild fuer ${licensePlate}`}
+      aria-label={`Kein Bild für ${licensePlate}`}
     >
       <Car className={cn("text-muted-foreground", iconSizeClasses[size])} />
     </div>

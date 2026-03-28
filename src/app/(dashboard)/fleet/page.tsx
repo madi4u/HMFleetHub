@@ -150,7 +150,7 @@ export default function FleetPage() {
             <SelectItem value="LKW">LKW</SelectItem>
             <SelectItem value="Transporter">Transporter</SelectItem>
             <SelectItem value="Motorrad">Motorrad</SelectItem>
-            <SelectItem value="Anhänger">Anhaenger</SelectItem>
+            <SelectItem value="Anhänger">Anhänger</SelectItem>
             <SelectItem value="Sonstige">Sonstige</SelectItem>
           </SelectContent>
         </Select>

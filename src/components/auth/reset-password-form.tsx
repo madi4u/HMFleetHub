@@ -25,10 +25,10 @@ const resetPasswordSchema = z
     password: z
       .string()
       .min(8, "Das Passwort muss mindestens 8 Zeichen lang sein."),
-    confirmPassword: z.string().min(1, "Bitte bestaetigen Sie das Passwort."),
+    confirmPassword: z.string().min(1, "Bitte bestätigen Sie das Passwort."),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Die Passwoerter stimmen nicht ueberein.",
+    message: "Die Passwörter stimmen nicht überein.",
     path: ["confirmPassword"],
   })
 
@@ -103,7 +103,7 @@ export function ResetPasswordForm() {
           )
         } else {
           setError(
-            "Fehler beim Aendern des Passworts. Bitte versuchen Sie es erneut."
+            "Fehler beim Ändern des Passworts. Bitte versuchen Sie es erneut."
           )
         }
         return
@@ -114,7 +114,7 @@ export function ResetPasswordForm() {
       setIsSuccess(true)
     } catch {
       setError(
-        "Verbindungsfehler. Bitte pruefen Sie Ihre Internetverbindung und versuchen Sie es erneut."
+        "Verbindungsfehler. Bitte prüfen Sie Ihre Internetverbindung und versuchen Sie es erneut."
       )
     } finally {
       setIsLoading(false)
@@ -127,7 +127,7 @@ export function ResetPasswordForm() {
       <div className="flex flex-col items-center gap-4 py-8">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         <p className="text-sm text-muted-foreground">
-          Link wird ueberprueft...
+          Link wird überprüft...
         </p>
       </div>
     )
@@ -141,10 +141,10 @@ export function ResetPasswordForm() {
           <AlertTriangle className="h-12 w-12 text-destructive" />
         </div>
         <h2 className="text-lg font-semibold text-foreground">
-          Ungueltiger oder abgelaufener Link
+          Ungültiger oder abgelaufener Link
         </h2>
         <p className="text-sm text-muted-foreground">
-          Dieser Link zum Zuruecksetzen des Passworts ist ungueltig oder
+          Dieser Link zum Zurücksetzen des Passworts ist ungültig oder
           abgelaufen. Bitte fordern Sie einen neuen Link an.
         </p>
         <Button variant="outline" className="w-full" asChild>
@@ -156,7 +156,7 @@ export function ResetPasswordForm() {
             className="inline-flex items-center text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
           >
             <ArrowLeft className="mr-1 h-3 w-3" />
-            Zurueck zum Login
+            Zurück zum Login
           </Link>
         </div>
       </div>
@@ -171,10 +171,10 @@ export function ResetPasswordForm() {
           <CheckCircle2 className="h-12 w-12 text-green-500" />
         </div>
         <h2 className="text-lg font-semibold text-foreground">
-          Passwort geaendert
+          Passwort geändert
         </h2>
         <p className="text-sm text-muted-foreground">
-          Ihr Passwort wurde erfolgreich geaendert. Sie koennen sich jetzt mit
+          Ihr Passwort wurde erfolgreich geändert. Sie können sich jetzt mit
           Ihrem neuen Passwort anmelden.
         </p>
         <Button className="w-full" asChild>
@@ -228,14 +228,14 @@ export function ResetPasswordForm() {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Passwort bestaetigen</FormLabel>
+              <FormLabel>Passwort bestätigen</FormLabel>
               <FormControl>
                 <Input
                   type="password"
                   placeholder="Passwort wiederholen"
                   autoComplete="new-password"
                   disabled={isLoading}
-                  aria-label="Passwort bestaetigen"
+                  aria-label="Passwort bestätigen"
                   {...field}
                 />
               </FormControl>

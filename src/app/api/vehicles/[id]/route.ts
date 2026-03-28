@@ -79,7 +79,7 @@ export async function GET(
 
     if (!uuidSchema.safeParse(id).success) {
       return NextResponse.json(
-        { error: "Ungueltige Fahrzeug-ID." },
+        { error: "Ungültige Fahrzeug-ID." },
         { status: 400 }
       )
     }
@@ -145,7 +145,7 @@ export async function PATCH(
 
     if (!uuidSchema.safeParse(id).success) {
       return NextResponse.json(
-        { error: "Ungueltige Fahrzeug-ID." },
+        { error: "Ungültige Fahrzeug-ID." },
         { status: 400 }
       )
     }
@@ -262,7 +262,7 @@ export async function DELETE(
 
     if (!uuidSchema.safeParse(id).success) {
       return NextResponse.json(
-        { error: "Ungueltige Fahrzeug-ID." },
+        { error: "Ungültige Fahrzeug-ID." },
         { status: 400 }
       )
     }
@@ -272,7 +272,7 @@ export async function DELETE(
       return NextResponse.json(
         {
           error:
-            "Nur TENANT_ADMIN oder SUPERADMIN duerfen Fahrzeuge loeschen.",
+            "Nur TENANT_ADMIN oder SUPERADMIN dürfen Fahrzeuge löschen.",
         },
         { status: 403 }
       )
@@ -306,7 +306,7 @@ export async function DELETE(
     if (deleteError) {
       console.error("vehicles/[id] DELETE error:", deleteError)
       return NextResponse.json(
-        { error: "Fehler beim Loeschen des Fahrzeugs." },
+        { error: "Fehler beim Löschen des Fahrzeugs." },
         { status: 500 }
       )
     }

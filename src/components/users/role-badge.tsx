@@ -23,7 +23,7 @@ const roleConfig: Record<
       "bg-cyan-500/20 text-cyan-400 border-cyan-500/30 hover:bg-cyan-500/30",
   },
   OFFICE_USER: {
-    label: "Bueroanwender",
+    label: "Büroanwender",
     className:
       "bg-yellow-500/20 text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/30",
   },

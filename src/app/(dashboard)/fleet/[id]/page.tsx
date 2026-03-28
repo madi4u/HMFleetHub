@@ -75,7 +75,7 @@ export default function VehicleDetailPage() {
         <Button variant="ghost" asChild>
           <Link href="/fleet">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Zurueck zur Fahrzeugliste
+            Zurück zur Fahrzeugliste
           </Link>
         </Button>
         <div className="flex flex-col items-center justify-center py-16">
@@ -98,7 +98,7 @@ export default function VehicleDetailPage() {
       <Button variant="ghost" size="sm" asChild>
         <Link href="/fleet">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Zurueck zur Fahrzeugliste
+          Zurück zur Fahrzeugliste
         </Link>
       </Button>
 
@@ -139,10 +139,10 @@ export default function VehicleDetailPage() {
         <TabsList className="flex flex-wrap">
           <TabsTrigger value="historie">Historie</TabsTrigger>
           <TabsTrigger value="stammdaten">Stammdaten</TabsTrigger>
-          <TabsTrigger value="vertraege">Vertraege</TabsTrigger>
+          <TabsTrigger value="vertraege">Verträge</TabsTrigger>
           <TabsTrigger value="medien">Medien</TabsTrigger>
           <TabsTrigger value="auswertungen">Auswertungen</TabsTrigger>
-          <TabsTrigger value="aktivitaeten">Aktivitaeten</TabsTrigger>
+          <TabsTrigger value="aktivitaeten">Aktivitäten</TabsTrigger>
         </TabsList>
 
         {/* Tab: Historie */}
@@ -240,15 +240,15 @@ export default function VehicleDetailPage() {
               <CardContent>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <DetailField
-                    label="Reifengroesse"
+                    label="Reifengröße"
                     value={vehicle.tire_size}
                   />
                   <DetailField
-                    label="Motoroel-Spezifikation"
+                    label="Motoröl-Spezifikation"
                     value={vehicle.engine_oil_spec}
                   />
                   <DetailField
-                    label="Getriebeoel-Spezifikation"
+                    label="Getriebeöl-Spezifikation"
                     value={vehicle.transmission_oil_spec}
                   />
                   <DetailField
@@ -326,14 +326,14 @@ export default function VehicleDetailPage() {
         <TabsContent value="aktivitaeten">
           <Card>
             <CardHeader>
-              <CardTitle>Aktivitaeten</CardTitle>
+              <CardTitle>Aktivitäten</CardTitle>
               <CardDescription>
-                Aktivitaetsverlauf fuer dieses Fahrzeug.
+                Aktivitätsverlauf für dieses Fahrzeug.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                Noch keine Aktivitaeten vorhanden.
+                Noch keine Aktivitäten vorhanden.
               </p>
             </CardContent>
           </Card>

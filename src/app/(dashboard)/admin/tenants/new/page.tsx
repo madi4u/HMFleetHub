@@ -62,7 +62,7 @@ export default function NewTenantPage() {
       <Button variant="ghost" asChild className="-ml-4">
         <Link href="/admin/tenants">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Zurueck zur Uebersicht
+          Zurück zur Übersicht
         </Link>
       </Button>
 

@@ -57,7 +57,7 @@ export async function requireAuthenticated(): Promise<
 
   if (membershipError || !memberships || memberships.length === 0) {
     return NextResponse.json(
-      { error: "Keine aktive Mandantenzugehoerigkeit gefunden." },
+      { error: "Keine aktive Mandantenzugehörigkeit gefunden." },
       { status: 403 }
     )
   }

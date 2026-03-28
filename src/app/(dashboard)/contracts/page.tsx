@@ -90,7 +90,7 @@ export default function ContractsPage() {
 
       const res = await fetch(`/api/contracts?${params.toString()}`)
       if (!res.ok) {
-        throw new Error("Vertraege konnten nicht geladen werden.")
+        throw new Error("Verträge konnten nicht geladen werden.")
       }
       const json: ContractsResponse = await res.json()
       setContracts(json.contracts)
@@ -139,7 +139,7 @@ export default function ContractsPage() {
           Vertragsverwaltung
         </h1>
         <p className="text-muted-foreground">
-          Alle Vertraege Ihres Fuhrparks auf einen Blick.
+          Alle Verträge Ihres Fuhrparks auf einen Blick.
         </p>
       </div>
 
@@ -173,7 +173,7 @@ export default function ContractsPage() {
               <AlertTriangle className="h-5 w-5 text-amber-400" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Laeuft bald ab</p>
+              <p className="text-sm text-muted-foreground">Läuft bald ab</p>
               <p className="text-2xl font-bold">{stats.expiringSoon}</p>
             </div>
           </CardContent>
@@ -200,7 +200,7 @@ export default function ContractsPage() {
             className="pl-9"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            aria-label="Vertraege durchsuchen"
+            aria-label="Verträge durchsuchen"
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -214,7 +214,7 @@ export default function ContractsPage() {
             <SelectItem value="all">Alle Status</SelectItem>
             <SelectItem value="ACTIVE">Aktiv</SelectItem>
             <SelectItem value="EXPIRED">Abgelaufen</SelectItem>
-            <SelectItem value="CANCELLED">Gekuendigt</SelectItem>
+            <SelectItem value="CANCELLED">Gekündigt</SelectItem>
             <SelectItem value="PLANNED">Geplant</SelectItem>
           </SelectContent>
         </Select>
@@ -234,11 +234,11 @@ export default function ContractsPage() {
       {!isLoading && !error && contracts.length === 0 && (
         <div className="flex flex-col items-center justify-center rounded-md border border-dashed py-16">
           <FileText className="mb-4 h-12 w-12 text-muted-foreground" />
-          <h3 className="text-lg font-semibold">Keine Vertraege gefunden</h3>
+          <h3 className="text-lg font-semibold">Keine Verträge gefunden</h3>
           <p className="mt-1 text-sm text-muted-foreground">
             {search || statusFilter !== "all"
               ? "Versuchen Sie andere Suchkriterien."
-              : "Es sind noch keine Vertraege vorhanden. Legen Sie Vertraege ueber die Fahrzeugdetailseite an."}
+              : "Es sind noch keine Verträge vorhanden. Legen Sie Verträge über die Fahrzeugdetailseite an."}
           </p>
         </div>
       )}

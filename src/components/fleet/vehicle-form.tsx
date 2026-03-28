@@ -300,7 +300,7 @@ export function VehicleForm({
                   >
                     <FormControl>
                       <SelectTrigger aria-label="Fahrzeugtyp">
-                        <SelectValue placeholder="Fahrzeugtyp waehlen" />
+                        <SelectValue placeholder="Fahrzeugtyp wählen" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -308,7 +308,7 @@ export function VehicleForm({
                       <SelectItem value="LKW">LKW</SelectItem>
                       <SelectItem value="Transporter">Transporter</SelectItem>
                       <SelectItem value="Motorrad">Motorrad</SelectItem>
-                      <SelectItem value="Anhänger">Anhaenger</SelectItem>
+                      <SelectItem value="Anhänger">Anhänger</SelectItem>
                       <SelectItem value="Sonstige">Sonstige</SelectItem>
                     </SelectContent>
                   </Select>
@@ -330,7 +330,7 @@ export function VehicleForm({
                   >
                     <FormControl>
                       <SelectTrigger aria-label="Status">
-                        <SelectValue placeholder="Status waehlen" />
+                        <SelectValue placeholder="Status wählen" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -365,7 +365,7 @@ export function VehicleForm({
                   disabled={isSubmitting}
                 >
                   <Upload className="mr-2 h-4 w-4" />
-                  Bild waehlen
+                  Bild wählen
                 </Button>
                 {imagePreview && (
                   <Button
@@ -483,7 +483,7 @@ export function VehicleForm({
                   <FormLabel>Farbe</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="z. B. Weiss"
+                      placeholder="z. B. Weiß"
                       disabled={isSubmitting}
                       aria-label="Farbe"
                       {...field}
@@ -523,7 +523,7 @@ export function VehicleForm({
                   <FormLabel>Standort</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="z. B. Muenchen Zentrale"
+                      placeholder="z. B. München Zentrale"
                       disabled={isSubmitting}
                       aria-label="Standort"
                       {...field}
@@ -586,12 +586,12 @@ export function VehicleForm({
               name="tire_size"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Reifengroesse</FormLabel>
+                  <FormLabel>Reifengröße</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="z. B. 225/65 R16C"
                       disabled={isSubmitting}
-                      aria-label="Reifengroesse"
+                      aria-label="Reifengröße"
                       {...field}
                     />
                   </FormControl>
@@ -605,12 +605,12 @@ export function VehicleForm({
               name="engine_oil_spec"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Motoroel-Spezifikation</FormLabel>
+                  <FormLabel>Motoröl-Spezifikation</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="z. B. 5W-30 MB 229.52"
                       disabled={isSubmitting}
-                      aria-label="Motoroel-Spezifikation"
+                      aria-label="Motoröl-Spezifikation"
                       {...field}
                     />
                   </FormControl>
@@ -624,12 +624,12 @@ export function VehicleForm({
               name="transmission_oil_spec"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Getriebeoel-Spezifikation</FormLabel>
+                  <FormLabel>Getriebeöl-Spezifikation</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="z. B. MB 236.14"
                       disabled={isSubmitting}
-                      aria-label="Getriebeoel-Spezifikation"
+                      aria-label="Getriebeöl-Spezifikation"
                       {...field}
                     />
                   </FormControl>
@@ -651,7 +651,7 @@ export function VehicleForm({
                   >
                     <FormControl>
                       <SelectTrigger aria-label="Kraftstoffart">
-                        <SelectValue placeholder="Kraftstoffart waehlen" />
+                        <SelectValue placeholder="Kraftstoffart wählen" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>

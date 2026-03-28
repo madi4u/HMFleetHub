@@ -9,7 +9,7 @@ import {
 
 export const metadata: Metadata = {
   title: "Passwort vergessen | H+M FleetHub",
-  description: "Setzen Sie Ihr Passwort zurueck.",
+  description: "Setzen Sie Ihr Passwort zurück.",
 }
 
 export default function ForgotPasswordPage() {

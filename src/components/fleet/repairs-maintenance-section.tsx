@@ -38,7 +38,7 @@ const FILTER_OPTIONS: FilterOption[] = [
   { label: "Alle", value: null },
   { label: "Reparaturen", value: "REPAIR" },
   { label: "Wartungen", value: "MAINTENANCE" },
-  { label: "Schaeden", value: "DAMAGE" },
+  { label: "Schäden", value: "DAMAGE" },
 ]
 
 function getDueDateStatus(
@@ -112,7 +112,7 @@ function DueDateDisplay({ nextDueDate }: { nextDueDate: string | null }) {
   if (status === "overdue") {
     return (
       <span className="text-xs text-red-400">
-        Ueberfaellig: {dateStr}
+        Überfällig: {dateStr}
       </span>
     )
   }
@@ -120,7 +120,7 @@ function DueDateDisplay({ nextDueDate }: { nextDueDate: string | null }) {
   if (status === "soon") {
     return (
       <span className="text-xs text-yellow-400">
-        Bald faellig: {dateStr}
+        Bald fällig: {dateStr}
       </span>
     )
   }
@@ -244,7 +244,7 @@ export function RepairsMaintenanceSection({
         {/* Empty state */}
         {!isLoading && !error && entries.length === 0 && (
           <p className="py-8 text-center text-sm text-muted-foreground">
-            Noch keine Reparaturen, Wartungen oder Schaeden erfasst.
+            Noch keine Reparaturen, Wartungen oder Schäden erfasst.
           </p>
         )}
 

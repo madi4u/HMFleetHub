@@ -228,7 +228,7 @@ export function ContractSheet({
           <SheetDescription>
             {isEdit
               ? "Vertragsdaten aktualisieren."
-              : "Erstellen Sie einen neuen Vertrag fuer dieses Fahrzeug."}
+              : "Erstellen Sie einen neuen Vertrag für dieses Fahrzeug."}
           </SheetDescription>
         </SheetHeader>
 
@@ -257,7 +257,7 @@ export function ContractSheet({
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Vertragsart waehlen" />
+                          <SelectValue placeholder="Vertragsart wählen" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -290,7 +290,7 @@ export function ContractSheet({
                       <SelectContent>
                         <SelectItem value="ACTIVE">Aktiv</SelectItem>
                         <SelectItem value="EXPIRED">Abgelaufen</SelectItem>
-                        <SelectItem value="CANCELLED">Gekuendigt</SelectItem>
+                        <SelectItem value="CANCELLED">Gekündigt</SelectItem>
                         <SelectItem value="PLANNED">Geplant</SelectItem>
                       </SelectContent>
                     </Select>
@@ -365,7 +365,7 @@ export function ContractSheet({
                 name="notice_period_days"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Kuendigungsfrist (Tage)</FormLabel>
+                    <FormLabel>Kündigungsfrist (Tage)</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -469,7 +469,7 @@ export function ContractSheet({
                 name="currency"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Waehrung</FormLabel>
+                    <FormLabel>Währung</FormLabel>
                     <FormControl>
                       <Input maxLength={3} placeholder="EUR" {...field} />
                     </FormControl>

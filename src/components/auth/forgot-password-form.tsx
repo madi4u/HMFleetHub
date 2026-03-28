@@ -21,7 +21,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { createClient } from "@/lib/supabase/client"
 
 const forgotPasswordSchema = z.object({
-  email: z.string().email("Bitte geben Sie eine gueltige E-Mail-Adresse ein."),
+  email: z.string().email("Bitte geben Sie eine gültige E-Mail-Adresse ein."),
 })
 
 type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>
@@ -66,7 +66,7 @@ export function ForgotPasswordForm() {
       if (resetError) {
         if (resetError.status === 429) {
           setError(
-            "Zu viele Anfragen. Bitte versuchen Sie es spaeter erneut."
+            "Zu viele Anfragen. Bitte versuchen Sie es später erneut."
           )
         } else {
           setError(
@@ -80,7 +80,7 @@ export function ForgotPasswordForm() {
       setIsSuccess(true)
     } catch {
       setError(
-        "Verbindungsfehler. Bitte pruefen Sie Ihre Internetverbindung und versuchen Sie es erneut."
+        "Verbindungsfehler. Bitte prüfen Sie Ihre Internetverbindung und versuchen Sie es erneut."
       )
     } finally {
       setIsLoading(false)
@@ -98,13 +98,13 @@ export function ForgotPasswordForm() {
         </h2>
         <p className="text-sm text-muted-foreground">
           Falls ein Konto mit dieser E-Mail-Adresse existiert, haben wir Ihnen
-          einen Link zum Zuruecksetzen Ihres Passworts gesendet. Bitte pruefen
+          einen Link zum Zurücksetzen Ihres Passworts gesendet. Bitte prüfen
           Sie Ihren Posteingang.
         </p>
         <Button variant="outline" className="w-full" asChild>
           <Link href="/login">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Zurueck zum Login
+            Zurück zum Login
           </Link>
         </Button>
       </div>
@@ -126,7 +126,7 @@ export function ForgotPasswordForm() {
 
         <p className="text-sm text-muted-foreground">
           Geben Sie Ihre E-Mail-Adresse ein und wir senden Ihnen einen Link zum
-          Zuruecksetzen Ihres Passworts.
+          Zurücksetzen Ihres Passworts.
         </p>
 
         <FormField
@@ -172,7 +172,7 @@ export function ForgotPasswordForm() {
             className="inline-flex items-center text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
           >
             <ArrowLeft className="mr-1 h-3 w-3" />
-            Zurueck zum Login
+            Zurück zum Login
           </Link>
         </div>
       </form>

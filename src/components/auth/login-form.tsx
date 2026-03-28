@@ -21,7 +21,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { createClient } from "@/lib/supabase/client"
 
 const loginSchema = z.object({
-  email: z.string().email("Bitte geben Sie eine gueltige E-Mail-Adresse ein."),
+  email: z.string().email("Bitte geben Sie eine gültige E-Mail-Adresse ein."),
   password: z.string().min(1, "Bitte geben Sie Ihr Passwort ein."),
 })
 
@@ -69,11 +69,11 @@ export function LoginForm() {
           setError("E-Mail oder Passwort ist falsch.")
         } else if (authError.message.includes("Email not confirmed")) {
           setError(
-            "Ihre E-Mail-Adresse wurde noch nicht bestaetigt. Bitte pruefen Sie Ihren Posteingang."
+            "Ihre E-Mail-Adresse wurde noch nicht bestätigt. Bitte prüfen Sie Ihren Posteingang."
           )
         } else if (authError.status === 429) {
           setError(
-            "Zu viele Anmeldeversuche. Bitte versuchen Sie es spaeter erneut."
+            "Zu viele Anmeldeversuche. Bitte versuchen Sie es später erneut."
           )
         } else {
           setError(
@@ -90,7 +90,7 @@ export function LoginForm() {
       }
     } catch {
       setError(
-        "Verbindungsfehler. Bitte pruefen Sie Ihre Internetverbindung und versuchen Sie es erneut."
+        "Verbindungsfehler. Bitte prüfen Sie Ihre Internetverbindung und versuchen Sie es erneut."
       )
     } finally {
       setIsLoading(false)

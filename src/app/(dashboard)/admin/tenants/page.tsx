@@ -113,7 +113,7 @@ export default function TenantsPage() {
       })
 
       if (!response.ok) {
-        throw new Error("Status konnte nicht geaendert werden.")
+        throw new Error("Status konnte nicht geändert werden.")
       }
 
       toast.success(
@@ -286,7 +286,7 @@ export default function TenantsPage() {
           <SheetHeader>
             <SheetTitle>Mandant bearbeiten</SheetTitle>
             <SheetDescription>
-              Aendern Sie die Stammdaten von {editingTenant?.name}.
+              Ändern Sie die Stammdaten von {editingTenant?.name}.
             </SheetDescription>
           </SheetHeader>
           <div className="mt-6">
@@ -294,7 +294,7 @@ export default function TenantsPage() {
               <TenantForm
                 tenant={editingTenant}
                 onSubmit={handleEditSubmit}
-                submitLabel="Aenderungen speichern"
+                submitLabel="Änderungen speichern"
                 onCancel={() => setEditingTenant(null)}
               />
             )}

@@ -8,7 +8,7 @@ import { requireAdminForTenant } from "@/lib/auth-guard"
 // ---------------------------------------------------------------------------
 
 const inviteSchema = z.object({
-  email: z.string().email("Ungueltige E-Mail-Adresse"),
+  email: z.string().email("Ungültige E-Mail-Adresse"),
   role: z.enum(
     [
       "TENANT_ADMIN",
@@ -17,7 +17,7 @@ const inviteSchema = z.object({
       "WORKSHOP_MECHANIC",
       "READ_ONLY",
     ] as const,
-    { message: "Ungueltige Rolle" }
+    { message: "Ungültige Rolle" }
   ),
 })
 
@@ -41,7 +41,7 @@ export async function POST(
     // Validate UUID format
     if (!z.string().uuid().safeParse(tenantId).success) {
       return NextResponse.json(
-        { error: "Ungueltige Mandanten-ID" },
+        { error: "Ungültige Mandanten-ID" },
         { status: 400 }
       )
     }
@@ -56,7 +56,7 @@ export async function POST(
       body = await request.json()
     } catch {
       return NextResponse.json(
-        { error: "Ungueltiger Request-Body" },
+        { error: "Ungültiger Request-Body" },
         { status: 400 }
       )
     }
@@ -97,7 +97,7 @@ export async function POST(
 
     if (tenant.status !== "active") {
       return NextResponse.json(
-        { error: "Mandant ist deaktiviert. Einladung nicht moeglich." },
+        { error: "Mandant ist deaktiviert. Einladung nicht möglich." },
         { status: 400 }
       )
     }
@@ -149,7 +149,7 @@ export async function POST(
       return NextResponse.json(
         {
           error:
-            "Benutzer wurde erstellt, aber die Mandantenzugehoerigkeit konnte nicht angelegt werden. Der Benutzer wurde wieder entfernt.",
+            "Benutzer wurde erstellt, aber die Mandantenzugehörigkeit konnte nicht angelegt werden. Der Benutzer wurde wieder entfernt.",
         },
         { status: 500 }
       )
@@ -245,7 +245,7 @@ async function handleExistingUser(
 
   if (membershipInsertError) {
     return NextResponse.json(
-      { error: "Fehler beim Erstellen der Mandantenzugehoerigkeit." },
+      { error: "Fehler beim Erstellen der Mandantenzugehörigkeit." },
       { status: 500 }
     )
   }

@@ -33,7 +33,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
 const inviteSchema = z.object({
-  email: z.string().email("Bitte geben Sie eine gueltige E-Mail-Adresse ein."),
+  email: z.string().email("Bitte geben Sie eine gültige E-Mail-Adresse ein."),
   role: z.enum(["TENANT_ADMIN", "FLEET_MANAGER", "OFFICE_USER", "READ_ONLY"]),
 })
 
@@ -163,8 +163,8 @@ export function InviteUserDialog({
                       disabled={isSubmitting}
                     >
                       <FormControl>
-                        <SelectTrigger aria-label="Rolle auswaehlen">
-                          <SelectValue placeholder="Rolle auswaehlen" />
+                        <SelectTrigger aria-label="Rolle auswählen">
+                          <SelectValue placeholder="Rolle auswählen" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -175,7 +175,7 @@ export function InviteUserDialog({
                           Fuhrparkleiter
                         </SelectItem>
                         <SelectItem value="OFFICE_USER">
-                          Bueroanwender
+                          Büroanwender
                         </SelectItem>
                         <SelectItem value="READ_ONLY">Nur Lesen</SelectItem>
                       </SelectContent>

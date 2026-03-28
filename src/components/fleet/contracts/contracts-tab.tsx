@@ -38,7 +38,7 @@ export function ContractsTab({ vehicleId, userRole }: ContractsTabProps) {
     try {
       const res = await fetch(`/api/vehicles/${vehicleId}/contracts`)
       if (!res.ok) {
-        throw new Error("Vertraege konnten nicht geladen werden.")
+        throw new Error("Verträge konnten nicht geladen werden.")
       }
       const json = await res.json()
       setContracts(json.data ?? [])
@@ -65,7 +65,7 @@ export function ContractsTab({ vehicleId, userRole }: ContractsTabProps) {
       <Card>
         <CardContent className="py-10 text-center">
           <p className="text-sm text-muted-foreground">
-            Keine Berechtigung fuer Vertragsdaten.
+            Keine Berechtigung für Vertragsdaten.
           </p>
         </CardContent>
       </Card>
@@ -112,7 +112,7 @@ export function ContractsTab({ vehicleId, userRole }: ContractsTabProps) {
         { method: "DELETE" }
       )
       if (!res.ok) {
-        throw new Error("Vertrag konnte nicht geloescht werden.")
+        throw new Error("Vertrag konnte nicht gelöscht werden.")
       }
       setContracts((prev) => prev.filter((c) => c.id !== contractId))
     } catch {
@@ -162,7 +162,7 @@ export function ContractsTab({ vehicleId, userRole }: ContractsTabProps) {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Vertraege</h2>
+        <h2 className="text-lg font-semibold">Verträge</h2>
         {canEdit && (
           <Button
             size="sm"
@@ -172,7 +172,7 @@ export function ContractsTab({ vehicleId, userRole }: ContractsTabProps) {
             }}
           >
             <Plus className="mr-2 h-4 w-4" />
-            Vertrag hinzufuegen
+            Vertrag hinzufügen
           </Button>
         )}
       </div>
@@ -182,7 +182,7 @@ export function ContractsTab({ vehicleId, userRole }: ContractsTabProps) {
         <Card>
           <CardHeader>
             <CardTitle className="text-base font-normal text-muted-foreground text-center">
-              Noch keine Vertraege erfasst.
+              Noch keine Verträge erfasst.
             </CardTitle>
           </CardHeader>
         </Card>

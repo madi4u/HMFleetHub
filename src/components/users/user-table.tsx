@@ -220,7 +220,7 @@ export function UserTable({
                 <Button
                   variant="ghost"
                   className="h-8 w-8 p-0"
-                  aria-label={`Aktionen fuer ${user.full_name ?? user.email}`}
+                  aria-label={`Aktionen für ${user.full_name ?? user.email}`}
                 >
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
@@ -228,7 +228,7 @@ export function UserTable({
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => onEditUser(user)}>
                   <ShieldCheck className="mr-2 h-4 w-4" />
-                  Rolle aendern
+                  Rolle ändern
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => onEditUser(user)}
@@ -328,7 +328,7 @@ export function UserTable({
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
-              Zurueck
+              Zurück
             </Button>
             <Button
               variant="outline"

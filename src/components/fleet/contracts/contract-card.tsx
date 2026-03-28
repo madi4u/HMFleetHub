@@ -85,24 +85,24 @@ export function ContractCard({
                 <Button
                   variant="ghost"
                   size="icon"
-                  aria-label="Vertrag loeschen"
+                  aria-label="Vertrag löschen"
                 >
                   <Trash2 className="h-4 w-4 text-destructive" />
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Vertrag loeschen?</AlertDialogTitle>
+                  <AlertDialogTitle>Vertrag löschen?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Moechten Sie diesen Vertrag bei {contract.provider} wirklich
-                    loeschen? Alle zugehoerigen Dokumente werden ebenfalls
-                    geloescht.
+                    Möchten Sie diesen Vertrag bei {contract.provider} wirklich
+                    löschen? Alle zugehörigen Dokumente werden ebenfalls
+                    gelöscht.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Abbrechen</AlertDialogCancel>
                   <AlertDialogAction onClick={() => onDelete(contract.id)}>
-                    Loeschen
+                    Löschen
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -130,7 +130,7 @@ export function ContractCard({
             value={contract.contract_number || "\u2014"}
           />
           <DetailItem
-            label="Kuendigungsfrist"
+            label="Kündigungsfrist"
             value={
               contract.notice_period_days != null
                 ? `${contract.notice_period_days} Tage`

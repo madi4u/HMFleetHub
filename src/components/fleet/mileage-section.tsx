@@ -144,7 +144,7 @@ export function MileageSection({
           <p className="text-sm text-destructive">{error}</p>
         ) : entries.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            Noch keine Kilometerstand-Eintraege vorhanden.
+            Noch keine Kilometerstand-Einträge vorhanden.
           </p>
         ) : (
           <div className="space-y-3">
@@ -304,7 +304,7 @@ function MileageDialog({
       <DialogHeader>
         <DialogTitle>Kilometerstand aktualisieren</DialogTitle>
         <DialogDescription>
-          Aktuellen Kilometerstand fuer dieses Fahrzeug erfassen.
+          Aktuellen Kilometerstand für dieses Fahrzeug erfassen.
         </DialogDescription>
       </DialogHeader>
 
@@ -335,7 +335,7 @@ function MileageDialog({
                 Eingegebener Kilometerstand (
                 {watchedMileage.toLocaleString("de-DE")} km) ist kleiner als der
                 letzte bekannte Wert (
-                {currentMileage!.toLocaleString("de-DE")} km). Moechtest du
+                {currentMileage!.toLocaleString("de-DE")} km). Möchtest du
                 trotzdem speichern?
               </AlertDescription>
             </Alert>
@@ -344,9 +344,9 @@ function MileageDialog({
           {isLargeJump && (
             <Alert className="border-yellow-500/50 bg-yellow-500/10 text-yellow-500">
               <AlertDescription>
-                Grosser Sprung erkannt: +
+                Großer Sprung erkannt: +
                 {(watchedMileage - currentMileage!).toLocaleString("de-DE")} km.
-                Bitte pruefen.
+                Bitte prüfen.
               </AlertDescription>
             </Alert>
           )}

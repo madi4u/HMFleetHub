@@ -9,15 +9,15 @@ import type { UserRole } from "@/types/database"
  * Validates email format, role against allowed values, and required tenant_id.
  */
 const inviteSchema = z.object({
-  email: z.email("Ungueltige E-Mail-Adresse"),
+  email: z.email("Ungültige E-Mail-Adresse"),
   role: z.enum([
     "TENANT_ADMIN",
     "FLEET_MANAGER",
     "OFFICE_USER",
     "WORKSHOP_MECHANIC",
     "READ_ONLY",
-  ] as const, "Ungueltige Rolle"),
-  tenant_id: z.uuid("Ungueltige Mandanten-ID"),
+  ] as const, "Ungültige Rolle"),
+  tenant_id: z.uuid("Ungültige Mandanten-ID"),
   full_name: z.string().optional(),
 })
 
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
       body = await request.json()
     } catch {
       return NextResponse.json(
-        { error: "Ungueltiger Request-Body" },
+        { error: "Ungültiger Request-Body" },
         { status: 400 }
       )
     }
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error:
-            "Nur SUPERADMIN oder TENANT_ADMIN des Mandanten duerfen Benutzer einladen.",
+            "Nur SUPERADMIN oder TENANT_ADMIN des Mandanten dürfen Benutzer einladen.",
         },
         { status: 403 }
       )
@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
 
     if (tenant.status !== "active") {
       return NextResponse.json(
-        { error: "Mandant ist deaktiviert. Einladung nicht moeglich." },
+        { error: "Mandant ist deaktiviert. Einladung nicht möglich." },
         { status: 400 }
       )
     }

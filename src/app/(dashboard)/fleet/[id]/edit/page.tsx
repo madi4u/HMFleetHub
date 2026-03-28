@@ -110,7 +110,7 @@ export default function EditVehiclePage() {
       if (!res.ok) {
         const json = await res.json().catch(() => ({}))
         throw new Error(
-          json.error || "Fahrzeug konnte nicht geloescht werden."
+          json.error || "Fahrzeug konnte nicht gelöscht werden."
         )
       }
 
@@ -138,7 +138,7 @@ export default function EditVehiclePage() {
         <Button variant="ghost" asChild>
           <Link href="/fleet">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Zurueck zur Fahrzeugliste
+            Zurück zur Fahrzeugliste
           </Link>
         </Button>
         <div className="flex flex-col items-center justify-center py-16">
@@ -159,7 +159,7 @@ export default function EditVehiclePage() {
         <Button variant="ghost" asChild>
           <Link href={`/fleet/${vehicle.id}`}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Zurueck zum Fahrzeug
+            Zurück zum Fahrzeug
           </Link>
         </Button>
         <div className="flex flex-col items-center justify-center py-16">
@@ -181,7 +181,7 @@ export default function EditVehiclePage() {
       <Button variant="ghost" size="sm" asChild>
         <Link href={`/fleet/${vehicle.id}`}>
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Zurueck zum Fahrzeug
+          Zurück zum Fahrzeug
         </Link>
       </Button>
 
@@ -203,22 +203,22 @@ export default function EditVehiclePage() {
             <AlertDialogTrigger asChild>
               <Button variant="destructive" disabled={isDeleting}>
                 <Trash2 className="mr-2 h-4 w-4" />
-                Fahrzeug loeschen
+                Fahrzeug löschen
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>
-                  Fahrzeug wirklich loeschen?
+                  Fahrzeug wirklich löschen?
                 </AlertDialogTitle>
                 <AlertDialogDescription>
                   Das Fahrzeug{" "}
                   <span className="font-semibold uppercase">
                     {vehicle.license_plate}
                   </span>{" "}
-                  ({vehicle.make} {vehicle.model}) wird als geloescht markiert
+                  ({vehicle.make} {vehicle.model}) wird als gelöscht markiert
                   und ist nicht mehr in der Fahrzeugliste sichtbar. Diese Aktion
-                  kann von einem Administrator rueckgaengig gemacht werden.
+                  kann von einem Administrator rückgängig gemacht werden.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -227,7 +227,7 @@ export default function EditVehiclePage() {
                   onClick={handleDelete}
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
-                  Endgueltig loeschen
+                  Endgültig löschen
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -248,7 +248,7 @@ export default function EditVehiclePage() {
           <VehicleForm
             vehicle={vehicle}
             onSubmit={handleSubmit}
-            submitLabel="Aenderungen speichern"
+            submitLabel="Änderungen speichern"
             onCancel={() => router.push(`/fleet/${vehicle.id}`)}
           />
         </CardContent>

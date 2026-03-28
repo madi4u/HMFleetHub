@@ -90,10 +90,10 @@ function DueDateDisplay({ nextDueDate }: { nextDueDate: string | null }) {
   if (!status || !nextDueDate) return null
   const dateStr = formatDateDE(nextDueDate)
   if (status === "overdue") {
-    return <span className="text-xs text-red-400">Ueberfaellig: {dateStr}</span>
+    return <span className="text-xs text-red-400">Überfällig: {dateStr}</span>
   }
   if (status === "soon") {
-    return <span className="text-xs text-yellow-400">Bald faellig: {dateStr}</span>
+    return <span className="text-xs text-yellow-400">Bald fällig: {dateStr}</span>
   }
   return <span className="text-xs text-muted-foreground">Folgetermin: {dateStr}</span>
 }
@@ -229,15 +229,15 @@ export function HistoryEntry({
                       disabled={isDeleting}
                     >
                       <Trash2 className="mr-1 h-3 w-3" />
-                      Loeschen
+                      Löschen
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Eintrag loeschen?</AlertDialogTitle>
+                      <AlertDialogTitle>Eintrag löschen?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Dieser Historieneintrag wird unwiderruflich geloescht.
-                        Diese Aktion kann nicht rueckgaengig gemacht werden.
+                        Dieser Historieneintrag wird unwiderruflich gelöscht.
+                        Diese Aktion kann nicht rückgängig gemacht werden.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -246,7 +246,7 @@ export function HistoryEntry({
                         onClick={handleDelete}
                         className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       >
-                        Loeschen
+                        Löschen
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>

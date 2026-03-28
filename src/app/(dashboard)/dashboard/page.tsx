@@ -61,7 +61,7 @@ export default function DashboardPage() {
     return (
       <div className="space-y-6">
         <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">Keine Daten verfuegbar.</p>
+        <p className="text-muted-foreground">Keine Daten verfügbar.</p>
       </div>
     )
   }
@@ -71,7 +71,7 @@ export default function DashboardPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">
-          Uebersicht ueber Ihren Fuhrpark.
+          Übersicht über Ihren Fuhrpark.
         </p>
       </div>
 

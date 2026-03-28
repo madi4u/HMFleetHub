@@ -59,7 +59,7 @@ export function DocumentPreview({
         { method: "DELETE" }
       )
       if (!res.ok) {
-        throw new Error("Loeschen fehlgeschlagen.")
+        throw new Error("Löschen fehlgeschlagen.")
       }
       onDeleted(doc.id)
     } catch (err) {
@@ -81,7 +81,7 @@ export function DocumentPreview({
             target="_blank"
             rel="noopener noreferrer"
             className="block"
-            aria-label={`${doc.file_name} in neuem Tab oeffnen`}
+            aria-label={`${doc.file_name} in neuem Tab öffnen`}
           >
             <img
               src={doc.signed_url}
@@ -154,15 +154,15 @@ export function DocumentPreview({
                   ) : (
                     <Trash2 className="mr-2 h-4 w-4" />
                   )}
-                  Loeschen
+                  Löschen
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Dokument loeschen?</AlertDialogTitle>
+                  <AlertDialogTitle>Dokument löschen?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    &quot;{doc.file_name}&quot; wird unwiderruflich geloescht.
-                    Diese Aktion kann nicht rueckgaengig gemacht werden.
+                    &quot;{doc.file_name}&quot; wird unwiderruflich gelöscht.
+                    Diese Aktion kann nicht rückgängig gemacht werden.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -171,7 +171,7 @@ export function DocumentPreview({
                     onClick={handleDelete}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   >
-                    Loeschen
+                    Löschen
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>

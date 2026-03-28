@@ -25,7 +25,7 @@ const typeConfig: Record<VehicleType, { label: string; className: string }> = {
       "bg-rose-500/20 text-rose-400 border-rose-500/30 hover:bg-rose-500/30",
   },
   "Anhänger": {
-    label: "Anhaenger",
+    label: "Anhänger",
     className:
       "bg-teal-500/20 text-teal-400 border-teal-500/30 hover:bg-teal-500/30",
   },

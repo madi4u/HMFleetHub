@@ -14,7 +14,7 @@ import type { CostCategory, CostSummary } from "@/types/database"
 const CATEGORY_LABELS: Record<CostCategory, string> = {
   REPAIR: "Reparatur",
   MAINTENANCE: "Wartung",
-  OIL: "Oelwechsel",
+  OIL: "Ölwechsel",
   TIRES: "Reifen",
   INSPECTION: "Inspektion",
   BODYWORK: "Karosserie",
@@ -111,7 +111,7 @@ export function CostSummaryTab({ vehicleId }: CostSummaryTabProps) {
         <CardContent className="flex items-center gap-3 py-8">
           <ShieldAlert className="h-5 w-5 text-muted-foreground" />
           <p className="text-sm text-muted-foreground">
-            Keine Berechtigung fuer Finanzdaten.
+            Keine Berechtigung für Finanzdaten.
           </p>
         </CardContent>
       </Card>
@@ -186,7 +186,7 @@ export function CostSummaryTab({ vehicleId }: CostSummaryTabProps) {
                       {CATEGORY_LABELS[item.category]}
                     </span>
                     <span className="text-xs text-muted-foreground">
-                      {item.count} {item.count === 1 ? "Eintrag" : "Eintraege"}
+                      {item.count} {item.count === 1 ? "Eintrag" : "Einträge"}
                     </span>
                   </div>
                   <span className="text-sm font-semibold">
@@ -203,7 +203,7 @@ export function CostSummaryTab({ vehicleId }: CostSummaryTabProps) {
       {sortedMonths.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Monatliche Aufschluesselung</CardTitle>
+            <CardTitle>Monatliche Aufschlüsselung</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -217,7 +217,7 @@ export function CostSummaryTab({ vehicleId }: CostSummaryTabProps) {
                   </span>
                   <div className="flex items-center gap-4">
                     <span className="text-xs text-muted-foreground">
-                      {item.count} {item.count === 1 ? "Eintrag" : "Eintraege"}
+                      {item.count} {item.count === 1 ? "Eintrag" : "Einträge"}
                     </span>
                     <span className="text-sm font-semibold">
                       {formatCurrency(item.total_gross)}

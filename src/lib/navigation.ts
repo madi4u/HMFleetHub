@@ -90,7 +90,7 @@ export const navigationConfig: NavigationGroup[] = [
         ],
       },
       {
-        title: "Vertraege",
+        title: "Verträge",
         href: "/contracts",
         icon: FileText,
         allowedRoles: [
@@ -199,7 +199,7 @@ export const routeLabels: Record<string, string> = {
   dashboard: "Dashboard",
   fleet: "Fahrzeuge",
   vehicles: "Fahrzeuge",
-  contracts: "Vertraege",
+  contracts: "Verträge",
   documents: "Dokumente",
   reports: "Berichte",
   workshop: "Werkstatt",

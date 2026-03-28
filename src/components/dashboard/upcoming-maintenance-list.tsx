@@ -38,13 +38,13 @@ export function UpcomingMaintenanceList({
     <Card>
       <CardHeader>
         <CardTitle className="text-base">
-          Bald faellige Termine (30 Tage)
+          Bald fällige Termine (30 Tage)
         </CardTitle>
       </CardHeader>
       <CardContent>
         {displayed.length === 0 ? (
           <p className="text-sm text-muted-foreground py-4 text-center">
-            Keine faelligen Termine in den naechsten 30 Tagen.
+            Keine fälligen Termine in den nächsten 30 Tagen.
           </p>
         ) : (
           <ul className="space-y-3" role="list">

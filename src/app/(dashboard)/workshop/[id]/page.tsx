@@ -65,7 +65,7 @@ export default function WorkshopVehicleDetailPage() {
           onClick={() => router.push("/workshop")}
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Zurueck
+          Zurück
         </Button>
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />

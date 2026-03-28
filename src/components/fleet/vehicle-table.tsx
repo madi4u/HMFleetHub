@@ -197,7 +197,7 @@ export function VehicleTable({
                 <Button
                   variant="ghost"
                   className="h-8 w-8 p-0"
-                  aria-label={`Aktionen fuer ${vehicle.license_plate}`}
+                  aria-label={`Aktionen für ${vehicle.license_plate}`}
                 >
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
@@ -221,7 +221,7 @@ export function VehicleTable({
                   <DropdownMenuItem asChild>
                     <Link href={`/fleet/${vehicle.id}/edit`}>
                       <Trash2 className="mr-2 h-4 w-4" />
-                      Loeschen
+                      Löschen
                     </Link>
                   </DropdownMenuItem>
                 )}
@@ -299,12 +299,12 @@ export function VehicleTable({
       {/* Pagination */}
       <div className="flex flex-col gap-4 pt-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Eintraege pro Seite:</span>
+          <span className="text-sm text-muted-foreground">Einträge pro Seite:</span>
           <Select
             value={String(pageSize)}
             onValueChange={(val) => onPageSizeChange(Number(val))}
           >
-            <SelectTrigger className="w-20" aria-label="Eintraege pro Seite">
+            <SelectTrigger className="w-20" aria-label="Einträge pro Seite">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -328,7 +328,7 @@ export function VehicleTable({
             onClick={() => onPageChange(page - 1)}
             disabled={page <= 1}
           >
-            Zurueck
+            Zurück
           </Button>
           <Button
             variant="outline"

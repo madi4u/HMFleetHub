@@ -84,7 +84,7 @@ export function ContractDocumentList({
       )
 
       if (!res.ok) {
-        throw new Error("Loeschen fehlgeschlagen")
+        throw new Error("Löschen fehlgeschlagen")
       }
 
       onDocumentDeleted(docId)
@@ -167,7 +167,7 @@ export function ContractDocumentList({
                         variant="ghost"
                         size="icon"
                         disabled={deletingId === doc.id}
-                        aria-label={`${doc.file_name} loeschen`}
+                        aria-label={`${doc.file_name} löschen`}
                       >
                         {deletingId === doc.id ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
@@ -178,10 +178,10 @@ export function ContractDocumentList({
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Dokument loeschen?</AlertDialogTitle>
+                        <AlertDialogTitle>Dokument löschen?</AlertDialogTitle>
                         <AlertDialogDescription>
-                          Moechten Sie &quot;{doc.file_name}&quot; wirklich
-                          loeschen? Diese Aktion kann nicht rueckgaengig gemacht
+                          Möchten Sie &quot;{doc.file_name}&quot; wirklich
+                          löschen? Diese Aktion kann nicht rückgängig gemacht
                           werden.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
@@ -190,7 +190,7 @@ export function ContractDocumentList({
                         <AlertDialogAction
                           onClick={() => handleDelete(doc.id)}
                         >
-                          Loeschen
+                          Löschen
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>

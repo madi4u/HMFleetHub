@@ -34,7 +34,7 @@ export async function POST(
 
     if (!uuidSchema.safeParse(id).success) {
       return NextResponse.json(
-        { error: "Ungueltige Fahrzeug-ID." },
+        { error: "Ungültige Fahrzeug-ID." },
         { status: 400 }
       )
     }
@@ -72,7 +72,7 @@ export async function POST(
     if (!ALLOWED_MIME_TYPES.includes(file.type)) {
       return NextResponse.json(
         {
-          error: `Ungueltiger Dateityp: ${file.type}. Erlaubt: ${ALLOWED_MIME_TYPES.join(", ")}`,
+          error: `Ungültiger Dateityp: ${file.type}. Erlaubt: ${ALLOWED_MIME_TYPES.join(", ")}`,
         },
         { status: 400 }
       )
@@ -81,7 +81,7 @@ export async function POST(
     // Validate file size
     if (file.size > MAX_FILE_SIZE) {
       return NextResponse.json(
-        { error: "Datei zu gross. Maximal 10 MB erlaubt." },
+        { error: "Datei zu groß. Maximal 10 MB erlaubt." },
         { status: 400 }
       )
     }

@@ -23,7 +23,7 @@ const updateTenantSchema = z
         "Slug darf nur Kleinbuchstaben, Zahlen und Bindestriche enthalten"
       )
       .optional(),
-    contact_email: z.string().email("Ungueltige E-Mail-Adresse").nullish(),
+    contact_email: z.string().email("Ungültige E-Mail-Adresse").nullish(),
     address: z
       .string()
       .max(500, "Adresse darf maximal 500 Zeichen lang sein")
@@ -57,7 +57,7 @@ export async function GET(
     // Validate UUID format
     if (!z.string().uuid().safeParse(id).success) {
       return NextResponse.json(
-        { error: "Ungueltige Mandanten-ID" },
+        { error: "Ungültige Mandanten-ID" },
         { status: 400 }
       )
     }
@@ -168,7 +168,7 @@ export async function PATCH(
     // Validate UUID format
     if (!z.string().uuid().safeParse(id).success) {
       return NextResponse.json(
-        { error: "Ungueltige Mandanten-ID" },
+        { error: "Ungültige Mandanten-ID" },
         { status: 400 }
       )
     }
@@ -179,7 +179,7 @@ export async function PATCH(
       body = await request.json()
     } catch {
       return NextResponse.json(
-        { error: "Ungueltiger Request-Body" },
+        { error: "Ungültiger Request-Body" },
         { status: 400 }
       )
     }
@@ -211,7 +211,7 @@ export async function PATCH(
         return NextResponse.json(
           {
             error:
-              "Sie koennen einen Mandanten nicht deaktivieren, in dem Sie selbst Mitglied sind.",
+              "Sie können einen Mandanten nicht deaktivieren, in dem Sie selbst Mitglied sind.",
           },
           { status: 400 }
         )

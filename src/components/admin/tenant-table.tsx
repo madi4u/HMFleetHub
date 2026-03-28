@@ -193,7 +193,7 @@ export function TenantTable({
                 <Button
                   variant="ghost"
                   className="h-8 w-8 p-0"
-                  aria-label={`Aktionen fuer ${tenant.name}`}
+                  aria-label={`Aktionen für ${tenant.name}`}
                 >
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
@@ -290,7 +290,7 @@ export function TenantTable({
         <div className="flex items-center justify-between pt-4">
           <p className="text-sm text-muted-foreground">
             Seite {table.getState().pagination.pageIndex + 1} von{" "}
-            {table.getPageCount()} ({filteredData.length} Eintraege)
+            {table.getPageCount()} ({filteredData.length} Einträge)
           </p>
           <div className="flex gap-2">
             <Button
@@ -299,7 +299,7 @@ export function TenantTable({
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
-              Zurueck
+              Zurück
             </Button>
             <Button
               variant="outline"
@@ -327,8 +327,8 @@ export function TenantTable({
             </AlertDialogTitle>
             <AlertDialogDescription>
               {confirmTenant?.status === "active"
-                ? `Moechten Sie "${confirmTenant?.name}" wirklich deaktivieren? Alle Benutzer dieses Mandanten koennen sich nicht mehr anmelden. Die Daten bleiben erhalten.`
-                : `Moechten Sie "${confirmTenant?.name}" wieder aktivieren? Benutzer koennen sich danach wieder anmelden.`}
+                ? `Möchten Sie "${confirmTenant?.name}" wirklich deaktivieren? Alle Benutzer dieses Mandanten können sich nicht mehr anmelden. Die Daten bleiben erhalten.`
+                : `Möchten Sie "${confirmTenant?.name}" wieder aktivieren? Benutzer können sich danach wieder anmelden.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

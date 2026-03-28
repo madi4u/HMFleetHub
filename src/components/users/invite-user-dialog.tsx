@@ -37,7 +37,7 @@ const inviteSchema = z.object({
   email: z
     .string()
     .min(1, "E-Mail-Adresse ist erforderlich.")
-    .email("Bitte geben Sie eine gueltige E-Mail-Adresse ein."),
+    .email("Bitte geben Sie eine gültige E-Mail-Adresse ein."),
   role: z.enum([
     "FLEET_MANAGER",
     "OFFICE_USER",
@@ -169,8 +169,8 @@ export function InviteUserDialog({
                       disabled={isSubmitting}
                     >
                       <FormControl>
-                        <SelectTrigger aria-label="Rolle auswaehlen">
-                          <SelectValue placeholder="Rolle auswaehlen" />
+                        <SelectTrigger aria-label="Rolle auswählen">
+                          <SelectValue placeholder="Rolle auswählen" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>

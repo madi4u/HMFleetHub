@@ -109,7 +109,7 @@ export function EditUserSheet({
 
     // Guard: cannot deactivate yourself
     if (isSelf && !values.is_active) {
-      setError("Sie koennen sich nicht selbst deaktivieren.")
+      setError("Sie können sich nicht selbst deaktivieren.")
       return
     }
 
@@ -153,7 +153,7 @@ export function EditUserSheet({
           <SheetTitle>Benutzer bearbeiten</SheetTitle>
           <SheetDescription>
             Rolle und Status von {user?.full_name ?? user?.email ?? "Benutzer"}{" "}
-            aendern.
+            ändern.
           </SheetDescription>
         </SheetHeader>
 
@@ -180,7 +180,7 @@ export function EditUserSheet({
                     <Input
                       value={user.full_name ?? "-"}
                       disabled
-                      aria-label="Name (nicht aenderbar)"
+                      aria-label="Name (nicht änderbar)"
                     />
                   </div>
                   <div>
@@ -190,7 +190,7 @@ export function EditUserSheet({
                     <Input
                       value={user.email}
                       disabled
-                      aria-label="E-Mail (nicht aenderbar)"
+                      aria-label="E-Mail (nicht änderbar)"
                     />
                   </div>
                 </div>
@@ -207,8 +207,8 @@ export function EditUserSheet({
                         disabled={isSubmitting}
                       >
                         <FormControl>
-                          <SelectTrigger aria-label="Rolle auswaehlen">
-                            <SelectValue placeholder="Rolle auswaehlen" />
+                          <SelectTrigger aria-label="Rolle auswählen">
+                            <SelectValue placeholder="Rolle auswählen" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -216,7 +216,7 @@ export function EditUserSheet({
                             Fuhrparkleiter
                           </SelectItem>
                           <SelectItem value="OFFICE_USER">
-                            Bueroanwender
+                            Büroanwender
                           </SelectItem>
                           <SelectItem value="WORKSHOP_MECHANIC">
                             Werkstatt
@@ -240,8 +240,8 @@ export function EditUserSheet({
                         </FormLabel>
                         <FormDescription>
                           {isSelf
-                            ? "Sie koennen sich nicht selbst deaktivieren."
-                            : "Deaktivierte Benutzer koennen sich nicht anmelden."}
+                            ? "Sie können sich nicht selbst deaktivieren."
+                            : "Deaktivierte Benutzer können sich nicht anmelden."}
                         </FormDescription>
                       </div>
                       <FormControl>
@@ -264,7 +264,7 @@ export function EditUserSheet({
                         Speichern...
                       </>
                     ) : (
-                      "Aenderungen speichern"
+                      "Änderungen speichern"
                     )}
                   </Button>
                   <Button

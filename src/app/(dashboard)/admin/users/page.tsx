@@ -189,7 +189,7 @@ export default function UsersPage() {
           <SelectContent>
             <SelectItem value="all">Alle Rollen</SelectItem>
             <SelectItem value="FLEET_MANAGER">Fuhrparkleiter</SelectItem>
-            <SelectItem value="OFFICE_USER">Bueroanwender</SelectItem>
+            <SelectItem value="OFFICE_USER">Büroanwender</SelectItem>
             <SelectItem value="WORKSHOP_MECHANIC">Werkstatt</SelectItem>
             <SelectItem value="READ_ONLY">Nur Lesen</SelectItem>
           </SelectContent>

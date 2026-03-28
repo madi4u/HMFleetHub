@@ -20,7 +20,7 @@ const createTenantSchema = z.object({
       /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
       "Slug darf nur Kleinbuchstaben, Zahlen und Bindestriche enthalten"
     ),
-  contact_email: z.string().email("Ungueltige E-Mail-Adresse").nullish(),
+  contact_email: z.string().email("Ungültige E-Mail-Adresse").nullish(),
   address: z.string().max(500, "Adresse darf maximal 500 Zeichen lang sein").nullish(),
 })
 
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
       body = await request.json()
     } catch {
       return NextResponse.json(
-        { error: "Ungueltiger Request-Body" },
+        { error: "Ungültiger Request-Body" },
         { status: 400 }
       )
     }
