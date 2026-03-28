@@ -662,6 +662,8 @@ export function VehicleForm({
                       <SelectItem value="Elektro">Elektro</SelectItem>
                       <SelectItem value="Hybrid">Hybrid</SelectItem>
                       <SelectItem value="Gas">Gas</SelectItem>
+                      <SelectItem value="LPG">LPG</SelectItem>
+                      <SelectItem value="CNG">CNG</SelectItem>
                       <SelectItem value="Sonstige">Sonstige</SelectItem>
                     </SelectContent>
                   </Select>

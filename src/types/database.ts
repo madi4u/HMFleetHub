@@ -129,6 +129,8 @@ export type FuelType =
   | "Elektro"
   | "Hybrid"
   | "Gas"
+  | "LPG"
+  | "CNG"
   | "Sonstige"
 
 /**

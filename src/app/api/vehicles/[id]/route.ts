@@ -31,6 +31,8 @@ const FUEL_TYPES: [string, ...string[]] = [
   "Elektro",
   "Hybrid",
   "Gas",
+  "LPG",
+  "CNG",
   "Sonstige",
 ]
 
