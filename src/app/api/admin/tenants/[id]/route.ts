@@ -78,23 +78,10 @@ export async function GET(
       )
     }
 
-    // Fetch users for this tenant via join: memberships + profiles
+    // Fetch memberships for this tenant (without profiles join — no FK to public.profiles)
     const { data: memberships, error: membershipsError } = await adminClient
       .from("user_tenant_memberships")
-      .select(
-        `
-        id,
-        user_id,
-        role,
-        is_active,
-        created_at,
-        profiles!inner (
-          id,
-          full_name,
-          avatar_url
-        )
-      `
-      )
+      .select("id, user_id, role, is_active, created_at")
       .eq("tenant_id", id)
       .order("created_at", { ascending: false })
       .limit(500)
@@ -106,14 +93,13 @@ export async function GET(
       )
     }
 
-    // Get user emails from auth.users via admin API
-    // We collect user_ids and batch-lookup
+    // Get user emails + full_names via separate queries
     const userIds = (memberships || []).map((m) => m.user_id)
     const emailMap: Record<string, string> = {}
+    const nameMap: Record<string, string | null> = {}
 
     if (userIds.length > 0) {
-      // Supabase admin listUsers doesn't support filtering by IDs,
-      // so we fetch all and filter in memory (tenant user count is bounded)
+      // Fetch emails from auth.users
       const { data: authUsers } = await adminClient.auth.admin.listUsers({
         perPage: 1000,
       })
@@ -122,6 +108,18 @@ export async function GET(
           if (userIds.includes(u.id)) {
             emailMap[u.id] = u.email || ""
           }
+        }
+      }
+
+      // Fetch full_name + avatar_url from profiles
+      const { data: profiles } = await adminClient
+        .from("profiles")
+        .select("id, full_name, avatar_url")
+        .in("id", userIds)
+
+      if (profiles) {
+        for (const p of profiles) {
+          nameMap[p.id] = p.full_name ?? null
         }
       }
     }
@@ -133,12 +131,8 @@ export async function GET(
       is_active: m.is_active,
       joined_at: m.created_at,
       email: emailMap[m.user_id] || "",
-      full_name:
-        (m.profiles as unknown as { full_name: string | null })
-          ?.full_name || null,
-      avatar_url:
-        (m.profiles as unknown as { avatar_url: string | null })
-          ?.avatar_url || null,
+      full_name: nameMap[m.user_id] ?? null,
+      avatar_url: null,
     }))
 
     return NextResponse.json({
