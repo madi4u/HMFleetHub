@@ -40,8 +40,8 @@ export function ContractsTab({ vehicleId, userRole }: ContractsTabProps) {
       if (!res.ok) {
         throw new Error("Vertraege konnten nicht geladen werden.")
       }
-      const data: Contract[] = await res.json()
-      setContracts(data)
+      const json = await res.json()
+      setContracts(json.data ?? [])
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Ein Fehler ist aufgetreten."

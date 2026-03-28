@@ -89,7 +89,7 @@ export default function EditVehiclePage() {
     // Upload image if new one selected
     if (imageFile) {
       const formData = new FormData()
-      formData.append("file", imageFile)
+      formData.append("image", imageFile)
 
       await fetch(`/api/vehicles/${params.id}/upload-image`, {
         method: "POST",

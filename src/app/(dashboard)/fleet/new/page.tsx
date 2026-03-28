@@ -65,7 +65,7 @@ export default function NewVehiclePage() {
     // Upload image if selected
     if (imageFile && vehicle.id) {
       const formData = new FormData()
-      formData.append("file", imageFile)
+      formData.append("image", imageFile)
 
       await fetch(`/api/vehicles/${vehicle.id}/upload-image`, {
         method: "POST",
