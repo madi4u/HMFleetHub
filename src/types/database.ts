@@ -116,6 +116,8 @@ export type VehicleType =
   | "Transporter"
   | "Motorrad"
   | "Anhänger"
+  | "Verkaufsanhänger"
+  | "Foodtruck"
   | "Sonstige"
 
 /**

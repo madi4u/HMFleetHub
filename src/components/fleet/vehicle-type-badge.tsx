@@ -29,6 +29,16 @@ const typeConfig: Record<VehicleType, { label: string; className: string }> = {
     className:
       "bg-teal-500/20 text-teal-400 border-teal-500/30 hover:bg-teal-500/30",
   },
+  "Verkaufsanhänger": {
+    label: "Verkaufsanhänger",
+    className:
+      "bg-orange-500/20 text-orange-400 border-orange-500/30 hover:bg-orange-500/30",
+  },
+  Foodtruck: {
+    label: "Foodtruck",
+    className:
+      "bg-lime-500/20 text-lime-400 border-lime-500/30 hover:bg-lime-500/30",
+  },
   Sonstige: {
     label: "Sonstige",
     className:

@@ -13,7 +13,9 @@ const VEHICLE_TYPES: [string, ...string[]] = [
   "LKW",
   "Transporter",
   "Motorrad",
-  "Anh\u00e4nger",
+  "Anhänger",
+  "Verkaufsanhänger",
+  "Foodtruck",
   "Sonstige",
 ]
 const VEHICLE_STATUSES: [string, ...string[]] = [

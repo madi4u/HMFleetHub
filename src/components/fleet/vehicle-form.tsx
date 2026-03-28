@@ -34,7 +34,7 @@ const vehicleFormSchema = z.object({
   make: z.string().min(1, "Marke ist erforderlich."),
   model: z.string().min(1, "Modell ist erforderlich."),
   vehicle_type: z.enum(
-    ["PKW", "LKW", "Transporter", "Motorrad", "Anh\u00e4nger", "Sonstige"],
+    ["PKW", "LKW", "Transporter", "Motorrad", "Anhänger", "Verkaufsanhänger", "Foodtruck", "Sonstige"],
     { message: "Fahrzeugtyp ist erforderlich." }
   ),
   status: z.enum(
@@ -309,6 +309,8 @@ export function VehicleForm({
                       <SelectItem value="Transporter">Transporter</SelectItem>
                       <SelectItem value="Motorrad">Motorrad</SelectItem>
                       <SelectItem value="Anhänger">Anhänger</SelectItem>
+                      <SelectItem value="Verkaufsanhänger">Verkaufsanhänger</SelectItem>
+                      <SelectItem value="Foodtruck">Foodtruck</SelectItem>
                       <SelectItem value="Sonstige">Sonstige</SelectItem>
                     </SelectContent>
                   </Select>
