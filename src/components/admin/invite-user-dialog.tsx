@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -58,7 +58,7 @@ export function InviteUserDialog({
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<InviteFormValues>({
-    resolver: standardSchemaResolver(inviteSchema),
+    resolver: zodResolver(inviteSchema),
     defaultValues: {
       email: "",
       role: "TENANT_ADMIN",

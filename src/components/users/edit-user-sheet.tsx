@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -69,7 +69,7 @@ export function EditUserSheet({
   const isSelf = user?.id === currentUserId
 
   const form = useForm<EditFormValues>({
-    resolver: standardSchemaResolver(editSchema),
+    resolver: zodResolver(editSchema),
     defaultValues: {
       role: "FLEET_MANAGER",
       is_active: true,

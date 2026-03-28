@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react"
 import { useForm } from "react-hook-form"
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { Paperclip, ChevronDown, ChevronUp, Loader2, X } from "lucide-react"
 
@@ -92,7 +92,7 @@ export function HistoryEntryInput({
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const form = useForm<HistoryEntryFormValues>({
-    resolver: standardSchemaResolver(historyEntrySchema),
+    resolver: zodResolver(historyEntrySchema),
     defaultValues: {
       entry_type: undefined,
       message: "",

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -162,7 +162,7 @@ export function ContractSheet({
   const [serverError, setServerError] = useState<string | null>(null)
 
   const form = useForm<FormValues>({
-    resolver: standardSchemaResolver(contractFormSchema),
+    resolver: zodResolver(contractFormSchema),
     defaultValues: toFormValues(contract),
   })
 

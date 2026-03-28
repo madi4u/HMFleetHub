@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2, Plus, Clock, User, MapPin } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -236,7 +236,7 @@ function MileageDialog({
 
   const form = useForm<MileageFormValues>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: standardSchemaResolver(mileageSchema) as any,
+    resolver: zodResolver(mileageSchema) as any,
     defaultValues: {
       mileage: undefined as unknown as number,
       recorded_at: toDatetimeLocalValue(new Date()),

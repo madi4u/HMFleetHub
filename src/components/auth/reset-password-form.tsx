@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2, ArrowLeft, CheckCircle2, AlertTriangle } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -41,7 +41,7 @@ export function ResetPasswordForm() {
   const [isValidToken, setIsValidToken] = useState<boolean | null>(null)
 
   const form = useForm<ResetPasswordFormValues>({
-    resolver: standardSchemaResolver(resetPasswordSchema),
+    resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
       password: "",
       confirmPassword: "",

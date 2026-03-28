@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useForm } from "react-hook-form"
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { Loader2 } from "lucide-react"
 
@@ -297,7 +297,7 @@ function EditEntrySheet({
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<EditFormValues>({
-    resolver: standardSchemaResolver(editSchema),
+    resolver: zodResolver(editSchema),
     defaultValues: {
       entry_type: entry.entry_type,
       title: entry.title || "",

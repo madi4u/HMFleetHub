@@ -4,7 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -32,7 +32,7 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<LoginFormValues>({
-    resolver: standardSchemaResolver(loginSchema),
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",

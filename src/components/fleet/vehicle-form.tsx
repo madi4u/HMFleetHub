@@ -3,7 +3,7 @@
 import { useState, useRef } from "react"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2, Upload, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -123,7 +123,7 @@ export function VehicleForm({
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const form = useForm<FormValues>({
-    resolver: standardSchemaResolver(vehicleFormSchema),
+    resolver: zodResolver(vehicleFormSchema),
     defaultValues: {
       license_plate: vehicle?.license_plate ?? "",
       make: vehicle?.make ?? "",
