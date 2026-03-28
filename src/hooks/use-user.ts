@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import type { User } from "@supabase/supabase-js"
+import type { SupabaseClient, User } from "@supabase/supabase-js"
 import type { UserRole } from "@/lib/navigation"
 import { createClient } from "@/lib/supabase/client"
 
@@ -40,8 +40,8 @@ export function useUser() {
           return
         }
 
-        // Fetch role from user_tenant_memberships
-        const appUser = await resolveAppUser(authUser)
+        // Reuse the same authenticated client instance for membership query
+        const appUser = await resolveAppUser(supabase, authUser)
         setUser(appUser)
       } catch {
         setUser(null)
@@ -58,12 +58,20 @@ export function useUser() {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_OUT" || !session?.user) {
         setUser(null)
+        setIsLoading(false)
         return
       }
 
-      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
-        const appUser = await resolveAppUser(session.user)
-        setUser(appUser)
+      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "INITIAL_SESSION") {
+        try {
+          // Reuse the same client that has the established session
+          const appUser = await resolveAppUser(supabase, session.user)
+          setUser(appUser)
+        } catch {
+          setUser(null)
+        } finally {
+          setIsLoading(false)
+        }
       }
     })
 
@@ -85,10 +93,12 @@ export function useUser() {
 /**
  * Resolves a Supabase auth user into an AppUser by fetching
  * their tenant membership and role.
+ * Uses the provided authenticated client to ensure RLS (auth.uid()) is set.
  */
-async function resolveAppUser(authUser: User): Promise<AppUser | null> {
-  const supabase = createClient()
-
+async function resolveAppUser(
+  supabase: SupabaseClient,
+  authUser: User
+): Promise<AppUser | null> {
   // Try to get role from user_tenant_memberships
   const { data: membership } = await supabase
     .from("user_tenant_memberships")

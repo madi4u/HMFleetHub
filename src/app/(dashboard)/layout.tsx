@@ -20,6 +20,7 @@ export default function DashboardLayout({
         <div className="flex flex-col items-center gap-4">
           <Skeleton className="h-10 w-10 rounded-full" />
           <Skeleton className="h-4 w-32" />
+          <p className="text-sm text-muted-foreground">Wird geladen…</p>
         </div>
       </div>
     )
