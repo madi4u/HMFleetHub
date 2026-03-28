@@ -106,7 +106,7 @@ export async function POST(
     const { data: inviteData, error: inviteError } =
       await adminClient.auth.admin.inviteUserByEmail(email, {
         redirectTo: `${
-          process.env.NEXT_PUBLIC_APP_URL || ""
+          process.env.NEXT_PUBLIC_APP_URL || "https://hm-fleethub.vercel.app"
         }/auth/reset-password`,
       })
 

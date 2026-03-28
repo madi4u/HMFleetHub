@@ -66,7 +66,9 @@ export function ResetPasswordForm() {
     const supabase = createClient()
 
     supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") {
+      // PASSWORD_RECOVERY = password reset link
+      // SIGNED_IN = invite link (first-time password setup)
+      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") {
         setIsValidToken(true)
       }
     })
