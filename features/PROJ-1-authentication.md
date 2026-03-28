@@ -349,4 +349,7 @@ Browser öffnet App
 - **Production Ready:** YES (2 low-severity UX issues remain for next sprint)
 
 ## Deployment
-_To be added by /deploy_
+**Deployed:** 2026-03-28
+**Production URL:** https://hm-fleethub.vercel.app
+**Platform:** Vercel (project: hm-fleethub)
+**Release:** v1.0.0

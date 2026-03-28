@@ -218,4 +218,7 @@ Indexes: (vehicle_id, tenant_id), (contract_end, tenant_id)
 - **Production Ready:** NO -- CRITICAL: missing database migration blocks all contract functionality
 
 ## Deployment
-_To be added by /deploy_
+**Deployed:** 2026-03-28
+**Production URL:** https://hm-fleethub.vercel.app
+**Platform:** Vercel (project: hm-fleethub)
+**Release:** v1.0.0

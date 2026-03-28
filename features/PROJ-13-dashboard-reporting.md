@@ -297,4 +297,7 @@ GET /api/dashboard
 - **Production Ready:** NO -- dashboard partially broken due to missing PROJ-9 and PROJ-10 migrations
 
 ## Deployment
-_To be added by /deploy_
+**Deployed:** 2026-03-28
+**Production URL:** https://hm-fleethub.vercel.app
+**Platform:** Vercel (project: hm-fleethub)
+**Release:** v1.0.0

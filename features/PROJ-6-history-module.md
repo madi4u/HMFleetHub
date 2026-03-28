@@ -300,4 +300,7 @@ Signierte URLs (privat, 1h Ablaufzeit)
 - **Production Ready:** YES (conditionally) -- no blocking bugs, but empty entry validation should be addressed
 
 ## Deployment
-_To be added by /deploy_
+**Deployed:** 2026-03-28
+**Production URL:** https://hm-fleethub.vercel.app
+**Platform:** Vercel (project: hm-fleethub)
+**Release:** v1.0.0
