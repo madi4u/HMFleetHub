@@ -135,11 +135,18 @@ export async function GET(
       avatar_url: null,
     }))
 
+    // Count active vehicles for this tenant
+    const { count: vehicleCount } = await adminClient
+      .from("vehicles")
+      .select("id", { count: "exact", head: true })
+      .eq("tenant_id", id)
+      .is("deleted_at", null)
+
     return NextResponse.json({
       tenant: {
         ...tenant,
         user_count: users.filter((u) => u.is_active).length,
-        vehicle_count: 0, // PROJ-5
+        vehicle_count: vehicleCount ?? 0,
       },
       users,
     })

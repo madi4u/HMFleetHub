@@ -49,13 +49,19 @@ export async function GET() {
       )
     }
 
-    // Fetch user counts per tenant via a single query
-    const { data: membershipCounts, error: countError } = await adminClient
-      .from("user_tenant_memberships")
-      .select("tenant_id")
-      .eq("is_active", true)
+    // Fetch user counts and vehicle counts per tenant in parallel
+    const [membershipResult, vehicleResult] = await Promise.all([
+      adminClient
+        .from("user_tenant_memberships")
+        .select("tenant_id")
+        .eq("is_active", true),
+      adminClient
+        .from("vehicles")
+        .select("tenant_id")
+        .is("deleted_at", null),
+    ])
 
-    if (countError) {
+    if (membershipResult.error) {
       return NextResponse.json(
         { error: "Fehler beim Laden der Benutzerzahlen." },
         { status: 500 }
@@ -64,14 +70,19 @@ export async function GET() {
 
     // Aggregate counts in memory (avoids N+1)
     const userCountMap: Record<string, number> = {}
-    for (const m of membershipCounts || []) {
+    for (const m of membershipResult.data || []) {
       userCountMap[m.tenant_id] = (userCountMap[m.tenant_id] || 0) + 1
+    }
+
+    const vehicleCountMap: Record<string, number> = {}
+    for (const v of vehicleResult.data || []) {
+      vehicleCountMap[v.tenant_id] = (vehicleCountMap[v.tenant_id] || 0) + 1
     }
 
     const tenantsWithCounts = (tenants || []).map((tenant) => ({
       ...tenant,
       user_count: userCountMap[tenant.id] || 0,
-      vehicle_count: 0, // Vehicles table not yet ready (PROJ-5)
+      vehicle_count: vehicleCountMap[tenant.id] || 0,
     }))
 
     return NextResponse.json({ tenants: tenantsWithCounts })
