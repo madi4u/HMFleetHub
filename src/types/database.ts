@@ -157,6 +157,7 @@ export interface Vehicle {
   engine_power: number | null
   hsn: string | null
   tsn: string | null
+  tuev_bis: string | null
   service_interval_notes: string | null
   technical_notes: string | null
   created_at: string
@@ -291,6 +292,7 @@ export interface VehicleWorkshopView {
   engine_power: number | null
   hsn: string | null
   tsn: string | null
+  tuev_bis: string | null
   service_interval_notes: string | null
   technical_notes: string | null
   created_at: string
@@ -476,6 +478,13 @@ export interface DashboardData {
     }>
     recent_activities: DashboardRecentActivity[]
     recent_mileage: DashboardRecentMileage[]
+    upcoming_tuev: Array<{
+      vehicle_id: string
+      license_plate: string
+      make: string
+      model: string
+      tuev_bis: string
+    }>
   }
   financial?: {
     cost_this_month: number

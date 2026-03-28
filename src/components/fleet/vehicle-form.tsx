@@ -57,6 +57,7 @@ const vehicleFormSchema = z.object({
   engine_power: z.string().optional(),
   hsn: z.string().optional(),
   tsn: z.string().optional(),
+  tuev_bis: z.string().optional(),
   service_interval_notes: z.string().optional(),
   technical_notes: z.string().optional(),
 })
@@ -94,6 +95,7 @@ function formToPayload(values: FormValues) {
       : undefined,
     hsn: values.hsn || undefined,
     tsn: values.tsn || undefined,
+    tuev_bis: values.tuev_bis ? values.tuev_bis + "-01" : undefined,
     service_interval_notes: values.service_interval_notes || undefined,
     technical_notes: values.technical_notes || undefined,
   }
@@ -161,6 +163,7 @@ export function VehicleForm({
         vehicle?.engine_power != null ? String(vehicle.engine_power) : "",
       hsn: vehicle?.hsn ?? "",
       tsn: vehicle?.tsn ?? "",
+      tuev_bis: vehicle?.tuev_bis ? vehicle.tuev_bis.substring(0, 7) : "",
       service_interval_notes: vehicle?.service_interval_notes ?? "",
       technical_notes: vehicle?.technical_notes ?? "",
     },
@@ -424,6 +427,25 @@ export function VehicleForm({
                       type="date"
                       disabled={isSubmitting}
                       aria-label="Erstzulassung"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="tuev_bis"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>TÜV bis</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="month"
+                      disabled={isSubmitting}
+                      aria-label="TÜV bis"
                       {...field}
                     />
                   </FormControl>

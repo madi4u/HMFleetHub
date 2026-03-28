@@ -195,6 +195,17 @@ export default function VehicleDetailPage() {
                     }
                   />
                   <DetailField
+                    label="TÜV bis"
+                    value={
+                      vehicle.tuev_bis
+                        ? new Date(vehicle.tuev_bis).toLocaleDateString("de-DE", {
+                            month: "2-digit",
+                            year: "numeric",
+                          })
+                        : null
+                    }
+                  />
+                  <DetailField
                     label="Baujahr"
                     value={vehicle.year?.toString() ?? null}
                   />

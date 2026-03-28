@@ -76,6 +76,30 @@ export async function GET() {
     }
 
     // ------------------------------------------------------------------
+    // 1b. Upcoming TÜV (next 3 months)
+    // ------------------------------------------------------------------
+    const in90Days = new Date(now)
+    in90Days.setDate(in90Days.getDate() + 90)
+
+    const { data: tuevRaw } = await adminClient
+      .from("vehicles")
+      .select("id, license_plate, make, model, tuev_bis")
+      .eq("tenant_id", tenantId)
+      .is("deleted_at", null)
+      .not("tuev_bis", "is", null)
+      .lte("tuev_bis", toISODate(in90Days))
+      .order("tuev_bis", { ascending: true })
+      .limit(20)
+
+    const upcomingTuev = (tuevRaw ?? []).map((v: Record<string, unknown>) => ({
+      vehicle_id: v.id as string,
+      license_plate: v.license_plate as string,
+      make: v.make as string,
+      model: v.model as string,
+      tuev_bis: v.tuev_bis as string,
+    }))
+
+    // ------------------------------------------------------------------
     // 2. Upcoming maintenance (next 30 days)
     // ------------------------------------------------------------------
     const { data: upcomingRaw, error: upcomingError } = await adminClient
@@ -236,6 +260,7 @@ export async function GET() {
       upcoming_maintenance: upcomingMaintenance,
       recent_activities: recentActivities,
       recent_mileage: recentMileage,
+      upcoming_tuev: upcomingTuev,
     }
 
     // ------------------------------------------------------------------

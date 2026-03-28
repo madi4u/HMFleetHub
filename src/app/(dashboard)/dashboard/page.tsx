@@ -9,6 +9,7 @@ import { StatCard } from "@/components/dashboard/stat-card"
 import { MonthlyCostChart } from "@/components/dashboard/monthly-cost-chart"
 import { CostByCategoryChart } from "@/components/dashboard/cost-by-category-chart"
 import { UpcomingMaintenanceList } from "@/components/dashboard/upcoming-maintenance-list"
+import { UpcomingTuevList } from "@/components/dashboard/upcoming-tuev-list"
 import { RecentActivityList } from "@/components/dashboard/recent-activity-list"
 import { ExpiringContractsList } from "@/components/dashboard/expiring-contracts-list"
 import { DashboardSkeleton } from "@/components/dashboard/dashboard-skeleton"
@@ -100,11 +101,12 @@ export default function DashboardPage() {
         />
       </div>
 
-      {/* Operative section: 2 columns on desktop */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      {/* Operative section */}
+      <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
         <UpcomingMaintenanceList
           items={data.operative.upcoming_maintenance}
         />
+        <UpcomingTuevList items={data.operative.upcoming_tuev} />
         <RecentActivityList items={data.operative.recent_activities} />
       </div>
 

@@ -55,6 +55,7 @@ const updateVehicleSchema = z.object({
   engine_power: z.number().int().min(0).nullable().optional(),
   hsn: z.string().max(10).nullable().optional(),
   tsn: z.string().max(10).nullable().optional(),
+  tuev_bis: z.string().nullable().optional(),
   service_interval_notes: z.string().max(2000).nullable().optional(),
   technical_notes: z.string().max(5000).nullable().optional(),
 })
