@@ -12,21 +12,19 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { routeLabels } from "@/lib/navigation"
+import { useUserContext } from "@/components/user-provider"
 
 /**
  * Dynamic breadcrumbs that update based on the current pathname.
  * Translates route segments to German labels from the central config.
+ * Prepends the current tenant name as the first breadcrumb item.
  */
 export function AppBreadcrumbs() {
   const pathname = usePathname()
+  const user = useUserContext()
 
   // Split the path into segments and filter out empty strings
   const segments = pathname.split("/").filter(Boolean)
-
-  // If we are at root or have no segments, show nothing
-  if (segments.length === 0) {
-    return null
-  }
 
   // Build breadcrumb items with cumulative hrefs
   const breadcrumbItems = segments.map((segment, index) => {
@@ -37,12 +35,22 @@ export function AppBreadcrumbs() {
     return { href, label, isLast, key: href }
   })
 
+  const tenantName = user?.tenantName
+
   return (
     <Breadcrumb>
       <BreadcrumbList>
+        {/* Tenant name as first item */}
+        {tenantName && (
+          <BreadcrumbItem>
+            <span className="font-medium text-foreground">{tenantName}</span>
+          </BreadcrumbItem>
+        )}
+
+        {/* Route segments */}
         {breadcrumbItems.map((item, index) => (
           <BreadcrumbItem key={item.key}>
-            {index > 0 && <BreadcrumbSeparator />}
+            {(tenantName || index > 0) && <BreadcrumbSeparator />}
             {item.isLast ? (
               <BreadcrumbPage>{item.label}</BreadcrumbPage>
             ) : (

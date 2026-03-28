@@ -25,7 +25,7 @@ export default async function DashboardLayout({
 
   const { data: membership } = await supabase
     .from("user_tenant_memberships")
-    .select("role")
+    .select("role, tenant_id")
     .eq("user_id", authUser.id)
     .eq("is_active", true)
     .limit(1)
@@ -35,17 +35,25 @@ export default async function DashboardLayout({
     redirect("/login")
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("full_name")
-    .eq("id", authUser.id)
-    .single()
+  const [profileResult, tenantResult] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", authUser.id)
+      .single(),
+    supabase
+      .from("tenants")
+      .select("name")
+      .eq("id", membership.tenant_id)
+      .single(),
+  ])
 
   const user = {
     id: authUser.id,
     email: authUser.email || "",
-    name: profile?.full_name || authUser.email?.split("@")[0] || "Benutzer",
+    name: profileResult.data?.full_name || authUser.email?.split("@")[0] || "Benutzer",
     role: membership.role as UserRole,
+    tenantName: tenantResult.data?.name || "",
   }
 
   return <DashboardShell user={user}>{children}</DashboardShell>

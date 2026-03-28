@@ -9,6 +9,7 @@ export interface AppUser {
   name: string
   email: string
   role: UserRole
+  tenantName?: string
 }
 
 const UserContext = createContext<AppUser | null>(null)
