@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "AI Coding Starter Kit with AI Agent Team System for Claude Code",
   "private": true,
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
