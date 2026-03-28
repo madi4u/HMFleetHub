@@ -66,7 +66,7 @@ export default function UsersPage() {
         throw new Error("Benutzer konnten nicht geladen werden.")
       }
       const data = await response.json()
-      setUsers(data)
+      setUsers(data.users ?? data)
     } catch (err) {
       setError(
         err instanceof Error
