@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AI Coding Starter Kit",
-  description: "Built with AI Agent Team System",
+  title: "H+M FleetHub",
+  description: "Mandantenfaehige Fuhrparkmanagement-Web-App",
 };
 
 export default function RootLayout({
@@ -12,8 +12,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="antialiased">
+    <html lang="de" className="dark">
+      <body className="min-h-screen bg-background font-sans antialiased">
         {children}
       </body>
     </html>
