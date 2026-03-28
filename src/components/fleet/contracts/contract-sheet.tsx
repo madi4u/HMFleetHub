@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import type { Resolver } from "react-hook-form"
 import { Loader2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -161,8 +161,19 @@ export function ContractSheet({
   const isEdit = !!contract
   const [serverError, setServerError] = useState<string | null>(null)
 
+  const contractResolver: Resolver<FormValues> = async (values) => {
+    const result = contractFormSchema.safeParse(values)
+    if (result.success) return { values: result.data, errors: {} }
+    const errors: Record<string, { type: string; message: string }> = {}
+    for (const issue of result.error.issues) {
+      const path = issue.path.join(".")
+      if (!errors[path]) errors[path] = { type: issue.code, message: issue.message }
+    }
+    return { values: {}, errors }
+  }
+
   const form = useForm<FormValues>({
-    resolver: zodResolver(contractFormSchema),
+    resolver: contractResolver,
     defaultValues: toFormValues(contract),
   })
 

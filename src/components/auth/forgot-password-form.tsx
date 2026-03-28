@@ -4,7 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import type { Resolver } from "react-hook-form"
 import { Loader2, ArrowLeft, CheckCircle2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -31,8 +31,19 @@ export function ForgotPasswordForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
 
+  const forgotPasswordResolver: Resolver<ForgotPasswordFormValues> = async (values) => {
+    const result = forgotPasswordSchema.safeParse(values)
+    if (result.success) return { values: result.data, errors: {} }
+    const errors: Record<string, { type: string; message: string }> = {}
+    for (const issue of result.error.issues) {
+      const path = issue.path.join(".")
+      if (!errors[path]) errors[path] = { type: issue.code, message: issue.message }
+    }
+    return { values: {}, errors }
+  }
+
   const form = useForm<ForgotPasswordFormValues>({
-    resolver: zodResolver(forgotPasswordSchema),
+    resolver: forgotPasswordResolver,
     defaultValues: {
       email: "",
     },

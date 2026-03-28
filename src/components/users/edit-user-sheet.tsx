@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import type { Resolver } from "react-hook-form"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -68,8 +68,19 @@ export function EditUserSheet({
 
   const isSelf = user?.id === currentUserId
 
+  const editResolver: Resolver<EditFormValues> = async (values) => {
+    const result = editSchema.safeParse(values)
+    if (result.success) return { values: result.data, errors: {} }
+    const errors: Record<string, { type: string; message: string }> = {}
+    for (const issue of result.error.issues) {
+      const path = issue.path.join(".")
+      if (!errors[path]) errors[path] = { type: issue.code, message: issue.message }
+    }
+    return { values: {}, errors }
+  }
+
   const form = useForm<EditFormValues>({
-    resolver: zodResolver(editSchema),
+    resolver: editResolver,
     defaultValues: {
       role: "FLEET_MANAGER",
       is_active: true,

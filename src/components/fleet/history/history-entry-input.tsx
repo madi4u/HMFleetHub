@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react"
 import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import type { Resolver } from "react-hook-form"
 import { z } from "zod"
 import { Paperclip, ChevronDown, ChevronUp, Loader2, X } from "lucide-react"
 
@@ -91,8 +91,19 @@ export function HistoryEntryInput({
   const [submitError, setSubmitError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const historyEntryResolver: Resolver<HistoryEntryFormValues> = async (values) => {
+    const result = historyEntrySchema.safeParse(values)
+    if (result.success) return { values: result.data, errors: {} }
+    const errors: Record<string, { type: string; message: string }> = {}
+    for (const issue of result.error.issues) {
+      const path = issue.path.join(".")
+      if (!errors[path]) errors[path] = { type: issue.code, message: issue.message }
+    }
+    return { values: {}, errors }
+  }
+
   const form = useForm<HistoryEntryFormValues>({
-    resolver: zodResolver(historyEntrySchema),
+    resolver: historyEntryResolver,
     defaultValues: {
       entry_type: undefined,
       message: "",

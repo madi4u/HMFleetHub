@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import type { Resolver } from "react-hook-form"
 import { Loader2, Plus, Clock, User, MapPin } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -234,9 +234,19 @@ function MileageDialog({
   const [submitting, setSubmitting] = useState(false)
   const [apiError, setApiError] = useState<string | null>(null)
 
+  const mileageResolver: Resolver<MileageFormValues> = async (values) => {
+    const result = mileageSchema.safeParse(values)
+    if (result.success) return { values: result.data, errors: {} }
+    const errors: Record<string, { type: string; message: string }> = {}
+    for (const issue of result.error.issues) {
+      const path = issue.path.join(".")
+      if (!errors[path]) errors[path] = { type: issue.code, message: issue.message }
+    }
+    return { values: {}, errors }
+  }
+
   const form = useForm<MileageFormValues>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: zodResolver(mileageSchema) as any,
+    resolver: mileageResolver,
     defaultValues: {
       mileage: undefined as unknown as number,
       recorded_at: toDatetimeLocalValue(new Date()),

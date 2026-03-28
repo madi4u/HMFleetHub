@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import type { Resolver } from "react-hook-form"
 import { z } from "zod"
 import { Loader2 } from "lucide-react"
 
@@ -296,8 +296,19 @@ function EditEntrySheet({
 }: EditEntrySheetProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const editResolver: Resolver<EditFormValues> = async (values) => {
+    const result = editSchema.safeParse(values)
+    if (result.success) return { values: result.data, errors: {} }
+    const errors: Record<string, { type: string; message: string }> = {}
+    for (const issue of result.error.issues) {
+      const path = issue.path.join(".")
+      if (!errors[path]) errors[path] = { type: issue.code, message: issue.message }
+    }
+    return { values: {}, errors }
+  }
+
   const form = useForm<EditFormValues>({
-    resolver: zodResolver(editSchema),
+    resolver: editResolver,
     defaultValues: {
       entry_type: entry.entry_type,
       title: entry.title || "",

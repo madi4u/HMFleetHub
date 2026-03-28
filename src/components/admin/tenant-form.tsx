@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import type { Resolver } from "react-hook-form"
 import { Loader2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -76,8 +76,19 @@ export function TenantForm({
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const tenantResolver: Resolver<TenantFormValues> = async (values) => {
+    const result = tenantFormSchema.safeParse(values)
+    if (result.success) return { values: result.data, errors: {} }
+    const errors: Record<string, { type: string; message: string }> = {}
+    for (const issue of result.error.issues) {
+      const path = issue.path.join(".")
+      if (!errors[path]) errors[path] = { type: issue.code, message: issue.message }
+    }
+    return { values: {}, errors }
+  }
+
   const form = useForm<TenantFormValues>({
-    resolver: zodResolver(tenantFormSchema),
+    resolver: tenantResolver,
     defaultValues: {
       name: tenant?.name ?? "",
       slug: tenant?.slug ?? "",
