@@ -346,7 +346,7 @@ export function VehicleForm({
 
           {/* Photo upload */}
           <div className="space-y-2">
-            <FormLabel>Fahrzeugfoto</FormLabel>
+            <label className="text-sm font-medium leading-none">Fahrzeugfoto</label>
             <div className="flex items-center gap-4">
               <VehiclePhoto
                 imageUrl={imagePreview}
