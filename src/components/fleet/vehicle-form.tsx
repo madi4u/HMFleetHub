@@ -3,7 +3,7 @@
 import { useState, useRef } from "react"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import type { Resolver } from "react-hook-form"
 import { Loader2, Upload, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -122,8 +122,19 @@ export function VehicleForm({
   )
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const vehicleResolver: Resolver<FormValues> = async (values) => {
+    const result = vehicleFormSchema.safeParse(values)
+    if (result.success) return { values: result.data, errors: {} }
+    const errors: Record<string, { type: string; message: string }> = {}
+    for (const issue of result.error.issues) {
+      const path = issue.path.join(".")
+      if (!errors[path]) errors[path] = { type: issue.code, message: issue.message }
+    }
+    return { values: {}, errors }
+  }
+
   const form = useForm<FormValues>({
-    resolver: zodResolver(vehicleFormSchema),
+    resolver: vehicleResolver,
     defaultValues: {
       license_plate: vehicle?.license_plate ?? "",
       make: vehicle?.make ?? "",
