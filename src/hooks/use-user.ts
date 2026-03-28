@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import type { SupabaseClient, User } from "@supabase/supabase-js"
-import type { UserRole } from "@/lib/navigation"
 import { createClient } from "@/lib/supabase/client"
+import type { UserRole } from "@/lib/navigation"
+import type { AuthMeResponse } from "@/types/database"
 
 /**
  * The app-level user object combining Supabase auth data
@@ -18,60 +18,45 @@ export interface AppUser {
 
 /**
  * Hook to access the current authenticated user.
- * Reads the session from Supabase and fetches the user's role
- * from user_tenant_memberships.
+ * Fetches user data from the server-side /api/auth/me endpoint
+ * so all auth/DB checks happen server-to-Supabase (reliable),
+ * not browser-to-Supabase (can hang or be blocked).
  */
 export function useUser() {
   const [user, setUser] = useState<AppUser | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const supabase = createClient()
-
-    async function loadUser() {
-      try {
-        const {
-          data: { user: authUser },
-        } = await supabase.auth.getUser()
-
-        if (!authUser) {
+    // Fetch user from server-side API — avoids browser→Supabase connectivity issues
+    fetch("/api/auth/me")
+      .then((r) => {
+        if (r.status === 401 || r.status === 403) return null
+        if (!r.ok) return null
+        return r.json() as Promise<AuthMeResponse>
+      })
+      .then((data) => {
+        if (!data) {
           setUser(null)
-          setIsLoading(false)
-          return
+        } else {
+          setUser({
+            id: data.id,
+            email: data.email,
+            name: data.full_name || data.email.split("@")[0] || "Benutzer",
+            role: data.role as UserRole,
+          })
         }
+      })
+      .catch(() => setUser(null))
+      .finally(() => setIsLoading(false))
 
-        // Reuse the same authenticated client instance for membership query
-        const appUser = await resolveAppUser(supabase, authUser)
-        setUser(appUser)
-      } catch {
-        setUser(null)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    loadUser()
-
-    // Listen for auth state changes (e.g., logout in another tab)
+    // Listen only for logout events (sign-out in another tab)
+    const supabase = createClient()
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === "SIGNED_OUT" || !session?.user) {
+    } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT") {
         setUser(null)
         setIsLoading(false)
-        return
-      }
-
-      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "INITIAL_SESSION") {
-        try {
-          // Reuse the same client that has the established session
-          const appUser = await resolveAppUser(supabase, session.user)
-          setUser(appUser)
-        } catch {
-          setUser(null)
-        } finally {
-          setIsLoading(false)
-        }
       }
     })
 
@@ -83,46 +68,8 @@ export function useUser() {
   const logout = useCallback(async () => {
     const supabase = createClient()
     await supabase.auth.signOut()
-    // Full page reload to clear all client state and trigger middleware
     window.location.href = "/login"
   }, [])
 
   return { user, isLoading, logout }
-}
-
-/**
- * Resolves a Supabase auth user into an AppUser by fetching
- * their tenant membership and role.
- * Uses the provided authenticated client to ensure RLS (auth.uid()) is set.
- */
-async function resolveAppUser(
-  supabase: SupabaseClient,
-  authUser: User
-): Promise<AppUser | null> {
-  // Try to get role from user_tenant_memberships
-  const { data: membership } = await supabase
-    .from("user_tenant_memberships")
-    .select("role, is_active")
-    .eq("user_id", authUser.id)
-    .limit(1)
-    .single()
-
-  // If no membership found or user is deactivated, return null
-  if (!membership || !membership.is_active) {
-    return null
-  }
-
-  // Get display name from profiles table or fall back to email
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("full_name")
-    .eq("id", authUser.id)
-    .single()
-
-  return {
-    id: authUser.id,
-    name: profile?.full_name || authUser.email?.split("@")[0] || "Benutzer",
-    email: authUser.email || "",
-    role: membership.role as UserRole,
-  }
 }
