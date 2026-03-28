@@ -75,7 +75,7 @@ export default function TenantsPage() {
         throw new Error("Mandanten konnten nicht geladen werden.")
       }
       const data = await response.json()
-      setTenants(data)
+      setTenants(data.tenants ?? data)
     } catch (err) {
       setError(
         err instanceof Error
