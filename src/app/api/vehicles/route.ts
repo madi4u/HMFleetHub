@@ -137,8 +137,21 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Generate signed URLs for vehicle photos stored as storage paths
+    const vehicles = await Promise.all(
+      (data ?? []).map(async (v) => {
+        if (v.image_url && !v.image_url.startsWith("http")) {
+          const { data: signed } = await adminClient.storage
+            .from("vehicle-media")
+            .createSignedUrl(v.image_url, 3600)
+          return { ...v, image_url: signed?.signedUrl ?? null }
+        }
+        return v
+      })
+    )
+
     const response: PaginatedVehicles = {
-      data: (data ?? []) as Vehicle[],
+      data: vehicles as Vehicle[],
       total: count ?? 0,
       page,
       pageSize,

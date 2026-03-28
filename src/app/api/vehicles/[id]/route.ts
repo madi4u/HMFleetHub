@@ -100,14 +100,24 @@ export async function GET(
       )
     }
 
+    // Generate signed URL for vehicle photo if stored as a storage path
+    let signedImageUrl: string | null = vehicle.image_url ?? null
+    if (signedImageUrl && !signedImageUrl.startsWith("http")) {
+      const { data: signed } = await adminClient.storage
+        .from("vehicle-media")
+        .createSignedUrl(signedImageUrl, 3600)
+      signedImageUrl = signed?.signedUrl ?? null
+    }
+    const vehicleWithImage = { ...vehicle, image_url: signedImageUrl }
+
     // WORKSHOP_MECHANIC: strip management-only fields
     if (guard.role === "WORKSHOP_MECHANIC") {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { notes, deleted_at, ...workshopFields } = vehicle
+      const { notes, deleted_at, ...workshopFields } = vehicleWithImage
       return NextResponse.json(workshopFields)
     }
 
-    return NextResponse.json(vehicle as Vehicle)
+    return NextResponse.json(vehicleWithImage as Vehicle)
   } catch (err) {
     console.error("vehicles/[id] GET unexpected error:", err)
     return NextResponse.json(
