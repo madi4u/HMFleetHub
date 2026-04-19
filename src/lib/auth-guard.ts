@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server"
 import { getSessionFromHeaders } from "@/lib/session"
+import { db } from "@/lib/db"
 import type { UserRole } from "@/types/database"
 import { hasPermission, type Permission } from "@/lib/permissions.config"
 
-/**
- * Result of a successful auth guard check.
- */
 export interface AuthGuardResult {
   userId: string
   memberships: {
@@ -16,13 +14,23 @@ export interface AuthGuardResult {
   isSuperadmin: boolean
 }
 
-/**
- * Result of a tenant-scoped auth guard.
- * Includes the resolved tenant_id and role for the current tenant context.
- */
 export interface TenantAuthResult extends AuthGuardResult {
   tenantId: string
   role: UserRole
+}
+
+async function resolveTenantId(userId: string): Promise<{ tenantId: string; role: UserRole } | null> {
+  const result = await db
+    .from("user_tenant_memberships")
+    .select("tenant_id, role")
+    .eq("user_id", userId)
+    .eq("is_active", true)
+    .limit(1)
+    .single()
+
+  if (!result.data) return null
+  const row = result.data as { tenant_id: string; role: UserRole }
+  return { tenantId: row.tenant_id, role: row.role }
 }
 
 export async function requireAuthenticated(): Promise<NextResponse | TenantAuthResult> {
@@ -30,12 +38,17 @@ export async function requireAuthenticated(): Promise<NextResponse | TenantAuthR
   if (!session) {
     return NextResponse.json({ error: "Nicht authentifiziert" }, { status: 401 })
   }
+
+  const resolved = await resolveTenantId(session.userId)
+  const tenantId = resolved?.tenantId ?? session.activeOrgId
+  const role = (resolved?.role ?? session.appRole) as UserRole
+
   return {
     userId: session.userId,
-    memberships: [{ role: session.appRole as UserRole, tenant_id: session.activeOrgId, is_active: true }],
+    memberships: [{ role, tenant_id: tenantId, is_active: true }],
     isSuperadmin: session.isSuperadmin,
-    tenantId: session.activeOrgId,
-    role: session.appRole as UserRole,
+    tenantId,
+    role,
   }
 }
 
@@ -58,9 +71,12 @@ export async function requireSuperadmin(): Promise<NextResponse | AuthGuardResul
   if (!session.isSuperadmin) {
     return NextResponse.json({ error: "Nur SUPERADMIN hat Zugriff auf diesen Endpunkt." }, { status: 403 })
   }
+  const resolved = await resolveTenantId(session.userId)
+  const tenantId = resolved?.tenantId ?? session.activeOrgId
+  const role = (resolved?.role ?? session.appRole) as UserRole
   return {
     userId: session.userId,
-    memberships: [{ role: session.appRole as UserRole, tenant_id: session.activeOrgId, is_active: true }],
+    memberships: [{ role, tenant_id: tenantId, is_active: true }],
     isSuperadmin: true,
   }
 }
@@ -76,9 +92,12 @@ export async function requireAdminForTenant(
   if (!session.isSuperadmin && !isTenantAdmin) {
     return NextResponse.json({ error: "Nur SUPERADMIN oder TENANT_ADMIN des Mandanten hat Zugriff." }, { status: 403 })
   }
+  const resolved = await resolveTenantId(session.userId)
+  const tenantId = resolved?.tenantId ?? session.activeOrgId
+  const role = (resolved?.role ?? session.appRole) as UserRole
   return {
     userId: session.userId,
-    memberships: [{ role: session.appRole as UserRole, tenant_id: session.activeOrgId, is_active: true }],
+    memberships: [{ role, tenant_id: tenantId, is_active: true }],
     isSuperadmin: session.isSuperadmin,
   }
 }
