@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { db } from "@/lib/db"
 import { requirePermissionGuard } from "@/lib/auth-guard"
 import { hasPermission } from "@/lib/permissions.config"
 import type {
@@ -102,21 +103,30 @@ export async function GET() {
     // ------------------------------------------------------------------
     // 2. Upcoming maintenance (next 30 days)
     // ------------------------------------------------------------------
-    const { data: upcomingRaw, error: upcomingError } = await adminClient
-      .from("vehicle_history_entries")
-      .select(
-        "id, vehicle_id, entry_type, title, next_due_date, repair_status, vehicles!inner(license_plate, make, model)"
+    let upcomingRaw: Record<string, unknown>[] | null = null
+    let upcomingError: unknown = null
+    try {
+      const r = await db.query(
+        `SELECT e.id, e.vehicle_id, e.entry_type, e.title, e.next_due_date, e.repair_status,
+                v.license_plate, v.make, v.model
+         FROM fleethub.vehicle_history_entries e
+         JOIN fleethub.vehicles v ON v.id = e.vehicle_id
+         WHERE e.tenant_id = $1
+           AND e.next_due_date IS NOT NULL
+           AND e.next_due_date >= $2
+           AND e.next_due_date <= $3
+           AND e.repair_status != 'DONE'
+         ORDER BY e.next_due_date ASC
+         LIMIT 10`,
+        [tenantId, toISODate(now), toISODate(in30Days)]
       )
-      .eq("tenant_id", tenantId)
-      .not("next_due_date", "is", null)
-      .gte("next_due_date", toISODate(now))
-      .lte("next_due_date", toISODate(in30Days))
-      .neq("repair_status", "DONE")
-      .order("next_due_date", { ascending: true })
-      .limit(10)
-
-    if (upcomingError) {
-      console.error("dashboard: upcoming maintenance error:", upcomingError)
+      upcomingRaw = r.rows.map((row) => ({
+        ...row,
+        vehicles: { license_plate: row.license_plate, make: row.make, model: row.model },
+      }))
+    } catch (err) {
+      upcomingError = err
+      console.error("dashboard: upcoming maintenance error:", err)
     }
 
     const upcomingMaintenance = (upcomingRaw ?? []).map((entry: Record<string, unknown>) => {
@@ -137,17 +147,26 @@ export async function GET() {
     // ------------------------------------------------------------------
     // 3. Recent activities (last 10 history entries)
     // ------------------------------------------------------------------
-    const { data: activitiesRaw, error: activitiesError } = await adminClient
-      .from("vehicle_history_entries")
-      .select(
-        "id, vehicle_id, entry_type, title, message, author_user_id, event_date, created_at, vehicles!inner(license_plate, make, model)"
+    let activitiesRaw: Record<string, unknown>[] | null = null
+    let activitiesError: unknown = null
+    try {
+      const r = await db.query(
+        `SELECT e.id, e.vehicle_id, e.entry_type, e.title, e.message, e.author_user_id, e.event_date, e.created_at,
+                v.license_plate, v.make, v.model
+         FROM fleethub.vehicle_history_entries e
+         JOIN fleethub.vehicles v ON v.id = e.vehicle_id
+         WHERE e.tenant_id = $1
+         ORDER BY e.created_at DESC
+         LIMIT 10`,
+        [tenantId]
       )
-      .eq("tenant_id", tenantId)
-      .order("created_at", { ascending: false })
-      .limit(10)
-
-    if (activitiesError) {
-      console.error("dashboard: recent activities error:", activitiesError)
+      activitiesRaw = r.rows.map((row) => ({
+        ...row,
+        vehicles: { license_plate: row.license_plate, make: row.make, model: row.model },
+      }))
+    } catch (err) {
+      activitiesError = err
+      console.error("dashboard: recent activities error:", err)
     }
 
     // Collect unique author IDs for name resolution
@@ -197,17 +216,26 @@ export async function GET() {
     // ------------------------------------------------------------------
     // 4. Recent mileage (last 5)
     // ------------------------------------------------------------------
-    const { data: mileageRaw, error: mileageError } = await adminClient
-      .from("mileage_entries")
-      .select(
-        "id, vehicle_id, user_id, mileage, recorded_at, vehicles!inner(license_plate, make, model)"
+    let mileageRaw: Record<string, unknown>[] | null = null
+    let mileageError: unknown = null
+    try {
+      const r = await db.query(
+        `SELECT e.id, e.vehicle_id, e.user_id, e.mileage, e.recorded_at,
+                v.license_plate, v.make, v.model
+         FROM fleethub.mileage_entries e
+         JOIN fleethub.vehicles v ON v.id = e.vehicle_id
+         WHERE e.tenant_id = $1
+         ORDER BY e.recorded_at DESC
+         LIMIT 5`,
+        [tenantId]
       )
-      .eq("tenant_id", tenantId)
-      .order("recorded_at", { ascending: false })
-      .limit(5)
-
-    if (mileageError) {
-      console.error("dashboard: recent mileage error:", mileageError)
+      mileageRaw = r.rows.map((row) => ({
+        ...row,
+        vehicles: { license_plate: row.license_plate, make: row.make, model: row.model },
+      }))
+    } catch (err) {
+      mileageError = err
+      console.error("dashboard: recent mileage error:", err)
     }
 
     // Collect mileage author IDs
@@ -390,25 +418,11 @@ export async function GET() {
       const in60Days = new Date(now)
       in60Days.setDate(in60Days.getDate() + 60)
 
-      const { data: contractsRaw, error: contractsError } = await adminClient
-        .from("contracts")
-        .select(
-          "id, vehicle_id, contract_type, contract_status, provider, contract_end, monthly_cost, currency, vehicles!inner(license_plate, make, model)"
-        )
-        .eq("tenant_id", tenantId)
-        .eq("contract_status", "ACTIVE")
-        .not("contract_end", "is", null)
-        .gte("contract_end", toISODate(now))
-        .lte("contract_end", toISODate(in60Days))
-        .order("contract_end", { ascending: true })
-        .limit(10)
-
-      if (contractsError) {
-        console.error("dashboard: contracts error:", contractsError)
-      }
+      // contracts table not yet migrated — skip query
+      const contractsRaw: Record<string, unknown>[] = []
 
       const expiringContracts: DashboardExpiringContract[] = (
-        contractsRaw ?? []
+        contractsRaw
       ).map((c: Record<string, unknown>) => {
         const v = c.vehicles as Record<string, unknown> | null
         return {
