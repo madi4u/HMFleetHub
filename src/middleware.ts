@@ -19,8 +19,12 @@ export async function middleware(request: NextRequest) {
     .split(";")
     .find((c) => c.trim().startsWith("hundm_session="))
 
+  const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? ""
+  const proto = request.headers.get("x-forwarded-proto") ?? "https"
+  const callbackUrl = `${proto}://${host}${request.nextUrl.pathname}${request.nextUrl.search}`
+
   if (!sessionCookie) {
-    return NextResponse.redirect(`${AUTH_SERVICE}/login?redirect=${encodeURIComponent(request.url)}`)
+    return NextResponse.redirect(`${AUTH_SERVICE}/login?callback=${encodeURIComponent(callbackUrl)}`)
   }
 
   try {
@@ -30,12 +34,12 @@ export async function middleware(request: NextRequest) {
     })
 
     if (!sessionRes.ok) {
-      return NextResponse.redirect(`${AUTH_SERVICE}/login?redirect=${encodeURIComponent(request.url)}`)
+      return NextResponse.redirect(`${AUTH_SERVICE}/login?callback=${encodeURIComponent(callbackUrl)}`)
     }
 
     const session = await sessionRes.json()
     if (!session?.userId) {
-      return NextResponse.redirect(`${AUTH_SERVICE}/login?redirect=${encodeURIComponent(request.url)}`)
+      return NextResponse.redirect(`${AUTH_SERVICE}/login?callback=${encodeURIComponent(callbackUrl)}`)
     }
 
     const accessRes = await fetch(`${AUTH_SERVICE}/api/access/check`, {
@@ -49,7 +53,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(`${AUTH_SERVICE}/select-org`)
     }
 
-    const { allowed, role } = await accessRes.json()
+    const { allowed, appRole } = await accessRes.json()
     if (!allowed) {
       return NextResponse.redirect(`${AUTH_SERVICE}/select-org`)
     }
@@ -60,12 +64,12 @@ export async function middleware(request: NextRequest) {
     requestHeaders.set("X-User-Name", session.name ?? "")
     requestHeaders.set("X-Org-Id", session.activeOrgId ?? "")
     requestHeaders.set("X-Org-Name", session.activeOrgName ?? "")
-    requestHeaders.set("X-App-Role", role ?? "VIEWER")
+    requestHeaders.set("X-App-Role", appRole ?? "VIEWER")
     requestHeaders.set("X-Is-Superadmin", session.isSuperadmin ? "true" : "false")
 
     return NextResponse.next({ request: { headers: requestHeaders } })
   } catch {
-    return NextResponse.redirect(`${AUTH_SERVICE}/login?redirect=${encodeURIComponent(request.url)}`)
+    return NextResponse.redirect(`${AUTH_SERVICE}/login?callback=${encodeURIComponent(callbackUrl)}`)
   }
 }
 
