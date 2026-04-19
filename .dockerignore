@@ -1,0 +1,11 @@
+.git
+.gitignore
+node_modules
+.next
+.env*.local
+README.md
+Dockerfile
+.dockerignore
+supabase
+docs
+features
