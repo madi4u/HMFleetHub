@@ -201,6 +201,7 @@ class UpdateBuilder {
   private updates: Row
   private conditions: string[] = []
   private values: unknown[] = []
+  private isSingle = false
 
   constructor(table: string, updates: Row, schema = "fleethub") {
     this.table = table
@@ -215,6 +216,7 @@ class UpdateBuilder {
   }
 
   select() { return this }
+  single() { this.isSingle = true; return this }
 
   async execute(): Promise<{ data: unknown; error: unknown }> {
     try {
@@ -222,12 +224,12 @@ class UpdateBuilder {
       const updateVals = updateKeys.map((k) => this.updates[k])
       const setClauses = updateKeys.map((k, i) => `"${k}" = $${i + 1}`)
       const allVals = [...updateVals, ...this.values]
-      const whereClauses = this.conditions.map((c, i) =>
+      const whereClauses = this.conditions.map((c) =>
         c.replace(/\$(\d+)/g, (_, n) => `$${Number(n) + updateKeys.length}`)
       )
       const sql = `UPDATE ${this.schema}."${this.table}" SET ${setClauses.join(", ")} WHERE ${whereClauses.join(" AND ")} RETURNING *`
       const result = await pool.query(sql, allVals)
-      return { data: result.rows, error: null }
+      return { data: this.isSingle ? result.rows[0] ?? null : result.rows, error: null }
     } catch (err) {
       return { data: null, error: err }
     }
@@ -276,8 +278,8 @@ class DeleteBuilder {
 export const db = {
   from(table: string) {
     return {
-      select(cols = "*") {
-        return new QueryBuilder(table).select(cols)
+      select(cols = "*", opts?: { count?: "exact"; head?: boolean }) {
+        return new QueryBuilder(table).select(cols, opts)
       },
       insert(row: Row) {
         return new InsertBuilder(table, row)

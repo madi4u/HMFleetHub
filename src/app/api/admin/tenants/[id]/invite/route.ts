@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
-import { createAdminClient } from "@/lib/supabase/admin"
+import { db } from "@/lib/db"
 import { requireAdminForTenant } from "@/lib/auth-guard"
-
-// ---------------------------------------------------------------------------
-// Zod Schema
-// ---------------------------------------------------------------------------
 
 const inviteSchema = z.object({
   email: z.string().email("Ungültige E-Mail-Adresse"),
@@ -21,24 +17,12 @@ const inviteSchema = z.object({
   ),
 })
 
-// ---------------------------------------------------------------------------
-// Route params type
-// ---------------------------------------------------------------------------
-
 type RouteContext = { params: Promise<{ id: string }> }
 
-// ---------------------------------------------------------------------------
-// POST /api/admin/tenants/[id]/invite
-// ---------------------------------------------------------------------------
-
-export async function POST(
-  request: NextRequest,
-  context: RouteContext
-) {
+export async function POST(request: NextRequest, context: RouteContext) {
   try {
     const { id: tenantId } = await context.params
 
-    // Validate UUID format
     if (!z.string().uuid().safeParse(tenantId).success) {
       return NextResponse.json(
         { error: "Ungültige Mandanten-ID" },
@@ -46,11 +30,9 @@ export async function POST(
       )
     }
 
-    // Auth check: SUPERADMIN or TENANT_ADMIN for this tenant
     const guard = await requireAdminForTenant(tenantId)
     if (guard instanceof NextResponse) return guard
 
-    // Parse body
     let body: unknown
     try {
       body = await request.json()
@@ -63,17 +45,14 @@ export async function POST(
 
     const parseResult = inviteSchema.safeParse(body)
     if (!parseResult.success) {
-      const errors = parseResult.error.issues.map((i) => i.message)
       return NextResponse.json(
-        { error: "Validierungsfehler", details: errors },
+        { error: "Validierungsfehler", details: parseResult.error.issues.map((i) => i.message) },
         { status: 400 }
       )
     }
 
     const { email, role } = parseResult.data
-    const adminClient = createAdminClient()
 
-    // TENANT_ADMIN cannot assign SUPERADMIN role
     if (!guard.isSuperadmin && role === ("SUPERADMIN" as string)) {
       return NextResponse.json(
         { error: "Nur SUPERADMIN kann die SUPERADMIN-Rolle vergeben." },
@@ -81,90 +60,88 @@ export async function POST(
       )
     }
 
-    // Verify target tenant exists and is active
-    const { data: tenant, error: tenantError } = await adminClient
-      .from("tenants")
-      .select("id, status")
-      .eq("id", tenantId)
-      .single()
-
-    if (tenantError || !tenant) {
-      return NextResponse.json(
-        { error: "Mandant nicht gefunden" },
-        { status: 404 }
-      )
+    // Verify tenant is active
+    const tenantRes = await db.query(
+      `SELECT id, status FROM fleethub.tenants WHERE id = $1`,
+      [tenantId]
+    )
+    const tenant = tenantRes.rows[0]
+    if (!tenant) {
+      return NextResponse.json({ error: "Mandant nicht gefunden" }, { status: 404 })
     }
-
     if (tenant.status !== "active") {
       return NextResponse.json(
-        { error: "Mandant ist deaktiviert. Einladung nicht möglich." },
+        { error: "Mandant ist deaktiviert. Hinzufügen nicht möglich." },
         { status: 400 }
       )
     }
 
-    // Invite the user via Supabase Auth (service role)
-    const { data: inviteData, error: inviteError } =
-      await adminClient.auth.admin.inviteUserByEmail(email, {
-        redirectTo: `${
-          process.env.NEXT_PUBLIC_APP_URL || "https://hm-fleethub.vercel.app"
-        }/auth/reset-password`,
-      })
+    // Look up user in identity.users by email
+    const userRes = await db.query(
+      `SELECT id, name FROM identity.users WHERE email = $1 AND is_active = true`,
+      [email]
+    )
+    const identityUser = userRes.rows[0]
 
-    if (inviteError) {
-      // If user already exists, assign them to the tenant
-      if (inviteError.message?.includes("already been registered")) {
-        return await handleExistingUser(
-          adminClient,
-          email,
-          tenantId,
-          role
-        )
-      }
-
-      return NextResponse.json(
-        { error: `Einladung fehlgeschlagen: ${inviteError.message}` },
-        { status: 500 }
-      )
-    }
-
-    if (!inviteData?.user) {
-      return NextResponse.json(
-        { error: "Einladung fehlgeschlagen: Kein Benutzer erstellt." },
-        { status: 500 }
-      )
-    }
-
-    // Create tenant membership for the new user
-    const { error: membershipError } = await adminClient
-      .from("user_tenant_memberships")
-      .insert({
-        user_id: inviteData.user.id,
-        tenant_id: tenantId,
-        role,
-      })
-
-    if (membershipError) {
-      // Rollback: delete the invited user if membership creation fails
-      await adminClient.auth.admin.deleteUser(inviteData.user.id)
+    if (!identityUser) {
       return NextResponse.json(
         {
           error:
-            "Benutzer wurde erstellt, aber die Mandantenzugehörigkeit konnte nicht angelegt werden. Der Benutzer wurde wieder entfernt.",
+            "Kein aktiver Benutzer mit dieser E-Mail gefunden. Der Benutzer muss sich zuerst über auth.hundm.cloud anmelden.",
         },
+        { status: 404 }
+      )
+    }
+
+    // Check existing membership
+    const memRes = await db.query(
+      `SELECT id, is_active, role FROM fleethub.user_tenant_memberships
+       WHERE user_id = $1 AND tenant_id = $2`,
+      [identityUser.id, tenantId]
+    )
+    const existingMem = memRes.rows[0]
+
+    if (existingMem) {
+      if (existingMem.is_active) {
+        return NextResponse.json(
+          {
+            error: `Benutzer ist bereits als ${existingMem.role} in diesem Mandanten aktiv.`,
+          },
+          { status: 409 }
+        )
+      }
+
+      // Reactivate
+      await db.query(
+        `UPDATE fleethub.user_tenant_memberships SET is_active = true, role = $1 WHERE id = $2`,
+        [role, existingMem.id]
+      )
+
+      return NextResponse.json({
+        message: "Benutzer wurde reaktiviert und dem Mandanten zugewiesen.",
+        user_id: identityUser.id,
+      })
+    }
+
+    // Create new membership
+    const insertRes = await db.query(
+      `INSERT INTO fleethub.user_tenant_memberships (user_id, tenant_id, role)
+       VALUES ($1, $2, $3)
+       RETURNING id`,
+      [identityUser.id, tenantId, role]
+    )
+
+    if (!insertRes.rows[0]) {
+      return NextResponse.json(
+        { error: "Fehler beim Erstellen der Mandantenzugehörigkeit." },
         { status: 500 }
       )
     }
 
-    // Update profile with tenant_id
-    await adminClient
-      .from("profiles")
-      .update({ tenant_id: tenantId })
-      .eq("id", inviteData.user.id)
-
     return NextResponse.json(
       {
-        message: "Einladung erfolgreich versendet.",
-        user_id: inviteData.user.id,
+        message: "Benutzer wurde dem Mandanten hinzugefügt.",
+        user_id: identityUser.id,
       },
       { status: 201 }
     )
@@ -174,91 +151,4 @@ export async function POST(
       { status: 500 }
     )
   }
-}
-
-// ---------------------------------------------------------------------------
-// Helper: handle invite when user already exists in auth.users
-// ---------------------------------------------------------------------------
-
-async function handleExistingUser(
-  adminClient: ReturnType<typeof createAdminClient>,
-  email: string,
-  tenantId: string,
-  role: string
-) {
-  // Look up the existing user
-  const { data: existingUsers } =
-    await adminClient.auth.admin.listUsers()
-  const existingUser = existingUsers?.users?.find(
-    (u) => u.email === email
-  )
-
-  if (!existingUser) {
-    return NextResponse.json(
-      {
-        error:
-          "Benutzer existiert bereits, konnte aber nicht gefunden werden.",
-      },
-      { status: 409 }
-    )
-  }
-
-  // Check if membership already exists
-  const { data: existingMem } = await adminClient
-    .from("user_tenant_memberships")
-    .select("id, is_active, role")
-    .eq("user_id", existingUser.id)
-    .eq("tenant_id", tenantId)
-    .single()
-
-  if (existingMem) {
-    if (existingMem.is_active) {
-      return NextResponse.json(
-        {
-          error: `Benutzer ist bereits als ${existingMem.role} in diesem Mandanten aktiv.`,
-        },
-        { status: 409 }
-      )
-    }
-
-    // Reactivate inactive membership with new role
-    await adminClient
-      .from("user_tenant_memberships")
-      .update({ is_active: true, role })
-      .eq("id", existingMem.id)
-
-    return NextResponse.json({
-      message:
-        "Benutzer wurde reaktiviert und dem Mandanten zugewiesen.",
-      user_id: existingUser.id,
-    })
-  }
-
-  // Create new membership for existing user
-  const { error: membershipInsertError } = await adminClient
-    .from("user_tenant_memberships")
-    .insert({
-      user_id: existingUser.id,
-      tenant_id: tenantId,
-      role,
-    })
-
-  if (membershipInsertError) {
-    return NextResponse.json(
-      { error: "Fehler beim Erstellen der Mandantenzugehörigkeit." },
-      { status: 500 }
-    )
-  }
-
-  // Update profile with tenant_id
-  await adminClient
-    .from("profiles")
-    .update({ tenant_id: tenantId })
-    .eq("id", existingUser.id)
-
-  return NextResponse.json({
-    message:
-      "Benutzer existiert bereits und wurde dem Mandanten zugewiesen.",
-    user_id: existingUser.id,
-  })
 }

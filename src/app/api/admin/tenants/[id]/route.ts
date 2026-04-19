@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
-import { createAdminClient } from "@/lib/supabase/admin"
+import { db } from "@/lib/db"
 import { requireSuperadmin } from "@/lib/auth-guard"
 
 // ---------------------------------------------------------------------------
@@ -62,91 +62,61 @@ export async function GET(
       )
     }
 
-    const adminClient = createAdminClient()
-
     // Fetch tenant
-    const { data: tenant, error: tenantError } = await adminClient
-      .from("tenants")
-      .select("*")
-      .eq("id", id)
-      .single()
+    const tenantRes = await db.query(
+      `SELECT * FROM fleethub.tenants WHERE id = $1`,
+      [id]
+    )
+    const tenant = tenantRes.rows[0]
 
-    if (tenantError || !tenant) {
+    if (!tenant) {
       return NextResponse.json(
         { error: "Mandant nicht gefunden" },
         { status: 404 }
       )
     }
 
-    // Fetch memberships for this tenant (without profiles join — no FK to public.profiles)
-    const { data: memberships, error: membershipsError } = await adminClient
-      .from("user_tenant_memberships")
-      .select("id, user_id, role, is_active, created_at")
-      .eq("tenant_id", id)
-      .order("created_at", { ascending: false })
-      .limit(500)
+    // Fetch memberships joined with identity.users
+    const membershipsRes = await db.query(
+      `SELECT
+         utm.id          AS membership_id,
+         utm.user_id,
+         utm.role,
+         utm.is_active,
+         utm.created_at  AS joined_at,
+         iu.email,
+         iu.name         AS full_name
+       FROM fleethub.user_tenant_memberships utm
+       LEFT JOIN identity.users iu ON iu.id = utm.user_id
+       WHERE utm.tenant_id = $1
+       ORDER BY utm.created_at DESC
+       LIMIT 500`,
+      [id]
+    )
 
-    if (membershipsError) {
-      return NextResponse.json(
-        { error: "Fehler beim Laden der Benutzer." },
-        { status: 500 }
-      )
-    }
-
-    // Get user emails + full_names via separate queries
-    const userIds = (memberships || []).map((m) => m.user_id)
-    const emailMap: Record<string, string> = {}
-    const nameMap: Record<string, string | null> = {}
-
-    if (userIds.length > 0) {
-      // Fetch emails from auth.users
-      const { data: authUsers } = await adminClient.auth.admin.listUsers({
-        perPage: 1000,
-      })
-      if (authUsers?.users) {
-        for (const u of authUsers.users) {
-          if (userIds.includes(u.id)) {
-            emailMap[u.id] = u.email || ""
-          }
-        }
-      }
-
-      // Fetch full_name + avatar_url from profiles
-      const { data: profiles } = await adminClient
-        .from("profiles")
-        .select("id, full_name, avatar_url")
-        .in("id", userIds)
-
-      if (profiles) {
-        for (const p of profiles) {
-          nameMap[p.id] = p.full_name ?? null
-        }
-      }
-    }
-
-    const users = (memberships || []).map((m) => ({
-      membership_id: m.id,
+    const users = membershipsRes.rows.map((m: Record<string, unknown>) => ({
+      membership_id: m.membership_id,
       user_id: m.user_id,
       role: m.role,
       is_active: m.is_active,
-      joined_at: m.created_at,
-      email: emailMap[m.user_id] || "",
-      full_name: nameMap[m.user_id] ?? null,
+      joined_at: m.joined_at,
+      email: m.email ?? "",
+      full_name: m.full_name ?? null,
       avatar_url: null,
     }))
 
     // Count active vehicles for this tenant
-    const { count: vehicleCount } = await adminClient
-      .from("vehicles")
-      .select("id", { count: "exact", head: true })
-      .eq("tenant_id", id)
-      .is("deleted_at", null)
+    const vehicleCountRes = await db.query(
+      `SELECT COUNT(*) AS cnt FROM fleethub.vehicles WHERE tenant_id = $1 AND deleted_at IS NULL`,
+      [id]
+    )
+    const vehicleCount = parseInt(vehicleCountRes.rows[0]?.cnt ?? "0")
 
     return NextResponse.json({
       tenant: {
         ...tenant,
         user_count: users.filter((u) => u.is_active).length,
-        vehicle_count: vehicleCount ?? 0,
+        vehicle_count: vehicleCount,
       },
       users,
     })
@@ -201,20 +171,15 @@ export async function PATCH(
     }
 
     const updates = parseResult.data
-    const adminClient = createAdminClient()
 
-    // If deactivating, check that the SUPERADMIN's own membership is not in this tenant
-    // (prevent locking yourself out)
+    // If deactivating, prevent locking yourself out
     if (updates.status === "inactive") {
-      const { data: callerMembership } = await adminClient
-        .from("user_tenant_memberships")
-        .select("id")
-        .eq("user_id", guard.userId)
-        .eq("tenant_id", id)
-        .eq("is_active", true)
-        .limit(1)
-
-      if (callerMembership && callerMembership.length > 0) {
+      const lockoutCheck = await db.query(
+        `SELECT id FROM fleethub.user_tenant_memberships
+         WHERE user_id = $1 AND tenant_id = $2 AND is_active = true LIMIT 1`,
+        [guard.userId, id]
+      )
+      if (lockoutCheck.rows.length > 0) {
         return NextResponse.json(
           {
             error:
@@ -225,17 +190,13 @@ export async function PATCH(
       }
     }
 
-    // If slug is being changed, check uniqueness
+    // Check slug uniqueness
     if (updates.slug) {
-      const { data: existing } = await adminClient
-        .from("tenants")
-        .select("id")
-        .eq("slug", updates.slug)
-        .neq("id", id)
-        .limit(1)
-        .single()
-
-      if (existing) {
+      const slugCheck = await db.query(
+        `SELECT id FROM fleethub.tenants WHERE slug = $1 AND id != $2 LIMIT 1`,
+        [updates.slug, id]
+      )
+      if (slugCheck.rows.length > 0) {
         return NextResponse.json(
           { error: "Ein Mandant mit diesem Slug existiert bereits." },
           { status: 409 }
@@ -243,25 +204,28 @@ export async function PATCH(
       }
     }
 
-    // Build update payload -- only include defined fields
-    const updatePayload: Record<string, unknown> = {}
-    if (updates.name !== undefined) updatePayload.name = updates.name
-    if (updates.slug !== undefined) updatePayload.slug = updates.slug
-    if (updates.contact_email !== undefined)
-      updatePayload.contact_email = updates.contact_email ?? null
-    if (updates.address !== undefined)
-      updatePayload.address = updates.address ?? null
-    if (updates.status !== undefined) updatePayload.status = updates.status
+    // Build SET clause dynamically
+    const fields: string[] = []
+    const vals: unknown[] = []
+    if (updates.name !== undefined) { fields.push("name"); vals.push(updates.name) }
+    if (updates.slug !== undefined) { fields.push("slug"); vals.push(updates.slug) }
+    if (updates.contact_email !== undefined) { fields.push("contact_email"); vals.push(updates.contact_email ?? null) }
+    if (updates.address !== undefined) { fields.push("address"); vals.push(updates.address ?? null) }
+    if (updates.status !== undefined) { fields.push("status"); vals.push(updates.status) }
 
-    const { data: tenant, error: updateError } = await adminClient
-      .from("tenants")
-      .update(updatePayload)
-      .eq("id", id)
-      .select()
-      .single()
+    vals.push(id)
+    const setClauses = fields.map((f, i) => `"${f}" = $${i + 1}`).join(", ")
 
-    if (updateError) {
-      if (updateError.code === "23505") {
+    let tenant: Record<string, unknown> | null = null
+    try {
+      const updateRes = await db.query(
+        `UPDATE fleethub.tenants SET ${setClauses} WHERE id = $${vals.length} RETURNING *`,
+        vals
+      )
+      tenant = updateRes.rows[0] ?? null
+    } catch (err: unknown) {
+      const pgErr = err as { code?: string }
+      if (pgErr?.code === "23505") {
         return NextResponse.json(
           { error: "Ein Mandant mit diesem Slug existiert bereits." },
           { status: 409 }
