@@ -1,7 +1,5 @@
 "use client"
 
-import { useCallback } from "react"
-import { createClient } from "@/lib/supabase/client"
 import { useUserContext } from "@/components/user-provider"
 import type { UserRole } from "@/lib/navigation"
 
@@ -23,12 +21,5 @@ export interface AppUser {
  */
 export function useUser() {
   const user = useUserContext() as AppUser | null
-
-  const logout = useCallback(async () => {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    window.location.href = "/login"
-  }, [])
-
-  return { user, isLoading: false, logout }
+  return { user, isLoading: false }
 }

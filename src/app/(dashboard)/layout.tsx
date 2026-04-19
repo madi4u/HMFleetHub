@@ -18,7 +18,7 @@ export default async function DashboardLayout({
     id: session.userId,
     email: session.email,
     name: session.name || session.email.split("@")[0] || "Benutzer",
-    role: (session.appRole?.toUpperCase() ?? "VIEWER") as UserRole,
+    role: (session.appRole?.toUpperCase() ?? "READ_ONLY") as UserRole,
     tenantName: session.activeOrgName || "",
   }
 

@@ -1,7 +1,6 @@
 "use client"
 
 import { createContext, useContext, useCallback } from "react"
-import { createClient } from "@/lib/supabase/client"
 import type { UserRole } from "@/lib/navigation"
 
 export interface AppUser {
@@ -30,8 +29,10 @@ export function useUserContext(): AppUser | null {
 
 export function useLogout() {
   return useCallback(async () => {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    window.location.href = "/login"
+    await fetch("https://auth.hundm.cloud/api/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    }).catch(() => {})
+    window.location.href = "https://auth.hundm.cloud/login"
   }, [])
 }
