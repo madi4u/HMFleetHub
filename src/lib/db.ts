@@ -16,14 +16,18 @@ class QueryBuilder {
   private orderByClause = ""
   private limitClause = ""
   private isSingle = false
+  private countOnly = false
+  private withCount = false
 
   constructor(table: string, schema = "fleethub") {
     this.table = table
     this.schema = schema
   }
 
-  select(cols: string) {
+  select(cols: string, opts?: { count?: "exact"; head?: boolean }) {
     this.selectCols = cols
+    if (opts?.count === "exact") this.withCount = true
+    if (opts?.head) this.countOnly = true
     return this
   }
 
@@ -59,6 +63,52 @@ class QueryBuilder {
     return this
   }
 
+  gte(col: string, val: unknown) {
+    this.values.push(val)
+    this.conditions.push(`"${col}" >= $${this.values.length}`)
+    return this
+  }
+
+  lte(col: string, val: unknown) {
+    this.values.push(val)
+    this.conditions.push(`"${col}" <= $${this.values.length}`)
+    return this
+  }
+
+  gt(col: string, val: unknown) {
+    this.values.push(val)
+    this.conditions.push(`"${col}" > $${this.values.length}`)
+    return this
+  }
+
+  lt(col: string, val: unknown) {
+    this.values.push(val)
+    this.conditions.push(`"${col}" < $${this.values.length}`)
+    return this
+  }
+
+  ilike(col: string, pattern: string) {
+    this.values.push(pattern)
+    this.conditions.push(`"${col}" ILIKE $${this.values.length}`)
+    return this
+  }
+
+  or(filter: string) {
+    // Accepts Supabase-style OR string: "col1.eq.val,col2.ilike.%val%"
+    const parts = filter.split(",").map((part) => {
+      const [col, op, ...rest] = part.trim().split(".")
+      const val = rest.join(".")
+      this.values.push(val)
+      const ph = `$${this.values.length}`
+      if (op === "eq") return `"${col}" = ${ph}`
+      if (op === "ilike") return `"${col}" ILIKE ${ph}`
+      if (op === "like") return `"${col}" LIKE ${ph}`
+      return `"${col}" = ${ph}`
+    })
+    this.conditions.push(`(${parts.join(" OR ")})`)
+    return this
+  }
+
   in(col: string, vals: unknown[]) {
     const placeholders = vals.map((v, i) => {
       this.values.push(v)
@@ -84,17 +134,23 @@ class QueryBuilder {
     return this
   }
 
-  async execute(): Promise<{ data: unknown; error: unknown }> {
+  async execute(): Promise<{ data: unknown; count?: number; error: unknown }> {
     try {
       const where = this.conditions.length
         ? `WHERE ${this.conditions.join(" AND ")}`
         : ""
+      if (this.countOnly) {
+        const sql = `SELECT COUNT(*) FROM ${this.schema}."${this.table}" ${where}`.trim()
+        const result = await pool.query(sql, this.values)
+        return { data: null, count: parseInt(result.rows[0]?.count ?? "0"), error: null }
+      }
       const sql = `SELECT ${this.selectCols} FROM ${this.schema}."${this.table}" ${where} ${this.orderByClause} ${this.limitClause}`.trim()
       const result = await pool.query(sql, this.values)
+      const count = this.withCount ? (result.rowCount ?? result.rows.length) : undefined
       if (this.isSingle) {
-        return { data: result.rows[0] ?? null, error: null }
+        return { data: result.rows[0] ?? null, count, error: null }
       }
-      return { data: result.rows, error: null }
+      return { data: result.rows, count, error: null }
     } catch (err) {
       return { data: null, error: err }
     }
