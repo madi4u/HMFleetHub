@@ -19,9 +19,8 @@ export async function middleware(request: NextRequest) {
     .split(";")
     .find((c) => c.trim().startsWith("hundm_session="))
 
-  const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? ""
-  const proto = request.headers.get("x-forwarded-proto") ?? "https"
-  const callbackUrl = `${proto}://${host}${request.nextUrl.pathname}${request.nextUrl.search}`
+  const appBase = process.env.NEXT_PUBLIC_APP_URL ?? `https://fleethub.hundm.cloud`
+  const callbackUrl = `${appBase}${request.nextUrl.pathname}${request.nextUrl.search}`
 
   if (!sessionCookie) {
     return NextResponse.redirect(`${AUTH_SERVICE}/login?callback=${encodeURIComponent(callbackUrl)}`)
