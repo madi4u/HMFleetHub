@@ -48,13 +48,15 @@ export async function middleware(request: NextRequest) {
       cache: "no-store",
     })
 
+    const selectOrgUrl = `${AUTH_SERVICE}/select-org?callback=${encodeURIComponent(callbackUrl)}`
+
     if (!accessRes.ok) {
-      return NextResponse.redirect(`${AUTH_SERVICE}/select-org`)
+      return NextResponse.redirect(selectOrgUrl)
     }
 
     const { allowed, appRole } = await accessRes.json()
     if (!allowed) {
-      return NextResponse.redirect(`${AUTH_SERVICE}/select-org`)
+      return NextResponse.redirect(selectOrgUrl)
     }
 
     const requestHeaders = new Headers(request.headers)
