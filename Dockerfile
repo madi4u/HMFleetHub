@@ -12,6 +12,10 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
+ARG NEXT_PUBLIC_APP_URL
+ENV NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-https://fleethub.hundm.cloud}
+ARG AUTH_SERVICE_URL
+ENV AUTH_SERVICE_URL=${AUTH_SERVICE_URL:-https://auth.hundm.cloud}
 RUN npm run build
 
 FROM base AS runner
