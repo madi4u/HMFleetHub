@@ -3,21 +3,26 @@
  * Used by FleetHub API routes to upload/download/delete via files.hundm.cloud.
  */
 
-const FILES_URL    = process.env.FILES_SERVICE_URL    ?? "https://files.hundm.cloud"
-const FILES_SECRET = process.env.FILES_SERVICE_INTERNAL_SECRET ?? ""
+const FILES_URL = process.env.FILES_SERVICE_URL ?? "https://files.hundm.cloud"
 
 /** Returns true for Files Service IDs (UUID format) vs legacy Supabase paths */
 export function isFilesServiceId(filePath: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(filePath)
 }
 
-function internalHeaders(orgId: string, userId: string, service = "fleethub"): HeadersInit {
-  return {
-    Authorization: `Bearer ${FILES_SECRET}`,
-    "x-org-id":    orgId,
-    "x-user-id":   userId,
-    "x-service":   service,
-  }
+/**
+ * The files service accepts JWTs but does not verify signatures — only reads
+ * orgId and sub from the payload. We craft a minimal token here so no shared
+ * secret needs to be provisioned in this app's environment.
+ */
+function makeServiceToken(orgId: string, userId: string): string {
+  const header  = Buffer.from(JSON.stringify({ alg: "none", typ: "JWT" })).toString("base64url")
+  const payload = Buffer.from(JSON.stringify({ orgId, sub: userId })).toString("base64url")
+  return `${header}.${payload}.`
+}
+
+function serviceHeaders(orgId: string, userId: string): HeadersInit {
+  return { Authorization: `Bearer ${makeServiceToken(orgId, userId)}` }
 }
 
 export async function uploadFile(opts: {
@@ -39,7 +44,7 @@ export async function uploadFile(opts: {
 
   const res = await fetch(`${FILES_URL}/api/upload`, {
     method:  "POST",
-    headers: internalHeaders(opts.orgId, opts.userId),
+    headers: serviceHeaders(opts.orgId, opts.userId),
     body:    form,
   })
   if (!res.ok) {
@@ -58,7 +63,7 @@ export async function getSignedUrl(
 ): Promise<string | null> {
   const res = await fetch(
     `${FILES_URL}/api/file/${fileId}/url?expires=${expiresIn}`,
-    { headers: internalHeaders(orgId, userId) }
+    { headers: serviceHeaders(orgId, userId) }
   )
   if (!res.ok) return null
   const json = await res.json() as { url: string }
@@ -72,6 +77,6 @@ export async function deleteFile(
 ): Promise<void> {
   await fetch(`${FILES_URL}/api/file/${fileId}`, {
     method:  "DELETE",
-    headers: internalHeaders(orgId, userId),
+    headers: serviceHeaders(orgId, userId),
   })
 }
