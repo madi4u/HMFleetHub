@@ -3,6 +3,7 @@ import { z } from "zod"
 import { requirePermissionGuard } from "@/lib/auth-guard"
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { getSignedUrl, isFilesServiceId } from "@/lib/files-service"
 
 const PAGE_SIZE = 20
 
@@ -129,15 +130,14 @@ export async function GET(
       .select("*")
       .in("history_entry_id", entryIds)
 
-    // Generate signed URLs
-    const adminClient = createAdminClient()
+    // Generate signed URLs via Files Service
     const enriched = await Promise.all(
       (attachments ?? []).map(
         async (att: { file_path: string; history_entry_id: string }) => {
-          const { data: signed } = await adminClient.storage
-            .from("vehicle-media")
-            .createSignedUrl(att.file_path, 3600)
-          return { ...att, signed_url: signed?.signedUrl ?? null }
+          const signedUrl = isFilesServiceId(att.file_path)
+            ? await getSignedUrl(att.file_path, auth.tenantId, auth.userId)
+            : null
+          return { ...att, signed_url: signedUrl }
         }
       )
     )
@@ -167,16 +167,16 @@ export async function GET(
   if (authorIds.length > 0) {
     const { data: profiles } = await adminClient
       .from("profiles")
-      .select("id, full_name, avatar_url")
-      .in("id", authorIds)
+      .select("user_id, full_name, avatar_url")
+      .in("user_id", authorIds)
 
     for (const p of profiles ?? []) {
       const profile = p as {
-        id: string
+        user_id: string
         full_name: string | null
         avatar_url: string | null
       }
-      profileMap[profile.id] = {
+      profileMap[profile.user_id] = {
         full_name: profile.full_name,
         avatar_url: profile.avatar_url,
       }

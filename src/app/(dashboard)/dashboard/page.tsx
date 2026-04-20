@@ -146,8 +146,9 @@ export default function DashboardPage() {
   )
 }
 
-function formatEuroCurrency(value: number): string {
-  return value.toLocaleString("de-DE", {
+function formatEuroCurrency(value: number | null | undefined): string {
+  const n = parseFloat(String(value ?? 0)) || 0
+  return n.toLocaleString("de-DE", {
     style: "currency",
     currency: "EUR",
     minimumFractionDigits: 2,

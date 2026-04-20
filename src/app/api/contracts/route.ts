@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { requirePermissionGuard } from "@/lib/auth-guard"
-import { createAdminClient } from "@/lib/supabase/admin"
+import { db } from "@/lib/db"
 
 export async function GET(request: NextRequest) {
   const auth = await requirePermissionGuard("vehicles.list")
@@ -8,37 +8,52 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = request.nextUrl
   const statusFilter = searchParams.get("status")
-  const search = searchParams.get("search")
+  const search = searchParams.get("search")?.trim() ?? ""
 
-  const adminClient = createAdminClient()
-
-  let query = adminClient
-    .from("contracts")
-    .select(
-      "id, vehicle_id, contract_type, contract_status, provider, contract_number, contract_start, contract_end, monthly_cost, currency, notice_period_days, created_at, updated_at, vehicles!inner(id, license_plate, make, model, tenant_id)"
-    )
-    .eq("vehicles.tenant_id", auth.tenantId)
-    .order("contract_start", { ascending: false })
-    .limit(500)
+  const values: unknown[] = [auth.tenantId]
+  const conditions: string[] = ["c.tenant_id = $1"]
 
   if (statusFilter && statusFilter !== "all") {
-    query = query.eq("contract_status", statusFilter)
+    values.push(statusFilter)
+    conditions.push(`c.contract_status = $${values.length}`)
   }
 
   if (search) {
-    query = query.or(
-      `provider.ilike.%${search}%,contract_number.ilike.%${search}%,vehicles.license_plate.ilike.%${search}%,vehicles.make.ilike.%${search}%,vehicles.model.ilike.%${search}%`
+    values.push(`%${search}%`)
+    const ph = `$${values.length}`
+    conditions.push(
+      `(c.provider ILIKE ${ph} OR c.contract_number ILIKE ${ph} OR v.license_plate ILIKE ${ph} OR v.make ILIKE ${ph} OR v.model ILIKE ${ph})`
     )
   }
 
-  const { data: contracts, error, count } = await query
+  const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : ""
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  const sql = `
+    SELECT
+      c.id, c.vehicle_id, c.contract_type, c.contract_status,
+      c.provider, c.contract_number, c.contract_start, c.contract_end,
+      c.monthly_cost, c.currency, c.notice_period_days,
+      c.created_at, c.updated_at,
+      json_build_object(
+        'id', v.id,
+        'license_plate', v.license_plate,
+        'make', v.make,
+        'model', v.model
+      ) AS vehicle
+    FROM fleethub.contracts c
+    JOIN fleethub.vehicles v ON v.id = c.vehicle_id
+    ${where}
+    ORDER BY c.contract_start DESC
+    LIMIT 500
+  `
+
+  try {
+    const result = await db.query(sql, values)
+    const contracts = result.rows
+
+    return NextResponse.json({ contracts, total: contracts.length })
+  } catch (err) {
+    console.error("contracts GET error:", err)
+    return NextResponse.json({ error: "Fehler beim Laden der Verträge." }, { status: 500 })
   }
-
-  return NextResponse.json({
-    contracts: contracts ?? [],
-    total: contracts?.length ?? 0,
-  })
 }

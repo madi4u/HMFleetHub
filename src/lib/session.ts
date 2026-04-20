@@ -22,6 +22,6 @@ export async function getSessionFromHeaders(): Promise<HundmSession | null> {
     isSuperadmin: hdrs.get("X-Is-Superadmin") === "true",
     activeOrgId: hdrs.get("X-Org-Id") ?? "",
     activeOrgName: hdrs.get("X-Org-Name") ?? "",
-    appRole: hdrs.get("X-App-Role") ?? "VIEWER",
+    appRole: hdrs.get("X-App-Role") ?? "READ_ONLY",
   }
 }

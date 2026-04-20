@@ -193,7 +193,7 @@ function MileageRow({ entry }: { entry: MileageEntry }) {
     <div className="flex items-start justify-between gap-4 rounded-md border border-border p-3">
       <div className="space-y-1">
         <p className="text-sm font-semibold">
-          {entry.mileage.toLocaleString("de-DE")} km
+          {(entry.mileage ?? 0).toLocaleString("de-DE")} km
         </p>
         <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1">

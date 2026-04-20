@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { requirePermissionGuard } from "@/lib/auth-guard"
 import { createClient } from "@/lib/supabase/server"
-import { createAdminClient } from "@/lib/supabase/admin"
+import { uploadFile, getSignedUrl } from "@/lib/files-service"
 
 const MAX_ATTACHMENTS = 10
 const MAX_IMAGE_SIZE = 50 * 1024 * 1024 // 50 MB
@@ -95,57 +95,25 @@ export async function POST(
     )
   }
 
-  const ext = file.name.split(".").pop() ?? "bin"
-  const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-  const filePath = `tenant/${auth.tenantId}/vehicles/${vehicleId}/history/${entryId}/${fileName}`
-
-  const adminClient = createAdminClient()
   const arrayBuffer = await file.arrayBuffer()
-  const { error: uploadError } = await adminClient.storage
-    .from("vehicle-media")
-    .upload(filePath, arrayBuffer, {
-      contentType: file.type,
-      upsert: false,
-    })
-
-  if (uploadError) {
-    return NextResponse.json(
-      { error: uploadError.message },
-      { status: 500 }
-    )
-  }
+  const fileId = await uploadFile({
+    body: arrayBuffer, fileName: file.name, mimeType: file.type,
+    orgId: auth.tenantId, userId: auth.userId,
+    sourceEntity: "history_entry", sourceEntityId: entryId,
+  })
 
   const { data: attachment, error: dbError } = await supabase
     .from("vehicle_history_attachments")
     .insert({
-      tenant_id: auth.tenantId,
-      history_entry_id: entryId,
-      vehicle_id: vehicleId,
-      file_path: filePath,
-      file_name: file.name,
-      mime_type: file.type,
-      file_size: file.size,
-      attachment_type: attachmentType,
+      tenant_id: auth.tenantId, history_entry_id: entryId,
+      vehicle_id: vehicleId, file_path: fileId,
+      file_name: file.name, mime_type: file.type,
+      file_size: file.size, attachment_type: attachmentType,
     })
-    .select()
-    .single()
+    .select().single()
 
-  if (dbError) {
-    // Cleanup orphaned storage file
-    await adminClient.storage.from("vehicle-media").remove([filePath])
-    return NextResponse.json(
-      { error: dbError.message },
-      { status: 500 }
-    )
-  }
+  if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
 
-  // Return with signed URL
-  const { data: signed } = await adminClient.storage
-    .from("vehicle-media")
-    .createSignedUrl(filePath, 3600)
-
-  return NextResponse.json(
-    { ...attachment, signed_url: signed?.signedUrl ?? null },
-    { status: 201 }
-  )
+  const signedUrl = await getSignedUrl(fileId, auth.tenantId, auth.userId)
+  return NextResponse.json({ ...attachment, signed_url: signedUrl }, { status: 201 })
 }

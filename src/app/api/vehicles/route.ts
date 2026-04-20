@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { requirePermissionGuard } from "@/lib/auth-guard"
+import { getSignedUrl, isFilesServiceId } from "@/lib/files-service"
 import type {
   Vehicle,
   VehicleType,
@@ -142,14 +143,12 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Generate signed URLs for vehicle photos stored as storage paths
+    // Generate signed URLs for vehicle photos stored as Files Service IDs
     const vehicles = await Promise.all(
       (data ?? []).map(async (v) => {
-        if (v.image_url && !v.image_url.startsWith("http")) {
-          const { data: signed } = await adminClient.storage
-            .from("vehicle-media")
-            .createSignedUrl(v.image_url, 3600)
-          return { ...v, image_url: signed?.signedUrl ?? null }
+        if (v.image_url && isFilesServiceId(v.image_url)) {
+          const url = await getSignedUrl(v.image_url, guard.tenantId, guard.userId)
+          return { ...v, image_url: url }
         }
         return v
       })

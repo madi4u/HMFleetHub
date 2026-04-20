@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { requirePermissionGuard } from "@/lib/auth-guard"
 import { createClient } from "@/lib/supabase/server"
-import { createAdminClient } from "@/lib/supabase/admin"
+import { uploadFile, getSignedUrl } from "@/lib/files-service"
 
 const MAX_DOC_SIZE = 50 * 1024 * 1024 // 50 MB
 const ALLOWED_MIME_TYPES = new Set([
@@ -79,55 +79,24 @@ export async function POST(
     )
   }
 
-  const ext = file.name.split(".").pop() ?? "bin"
-  const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-  const filePath = `tenant/${auth.tenantId}/contracts/${contractId}/${fileName}`
-
-  const adminClient = createAdminClient()
   const arrayBuffer = await file.arrayBuffer()
-  const { error: uploadError } = await adminClient.storage
-    .from("vehicle-media")
-    .upload(filePath, arrayBuffer, {
-      contentType: file.type,
-      upsert: false,
-    })
+  const fileId = await uploadFile({
+    body: arrayBuffer, fileName: file.name, mimeType: file.type,
+    orgId: auth.tenantId, userId: auth.userId,
+    sourceEntity: "contract", sourceEntityId: contractId,
+  })
 
-  if (uploadError) {
-    return NextResponse.json(
-      { error: uploadError.message },
-      { status: 500 }
-    )
-  }
-
-  const { data: document, error: dbError } = await adminClient
+  const { data: document, error: dbError } = await supabase
     .from("contract_documents")
     .insert({
-      tenant_id: auth.tenantId,
-      contract_id: contractId,
-      file_path: filePath,
-      file_name: file.name,
-      mime_type: file.type,
-      file_size: file.size,
+      tenant_id: auth.tenantId, contract_id: contractId,
+      file_path: fileId, file_name: file.name,
+      mime_type: file.type, file_size: file.size,
     })
-    .select()
-    .single()
+    .select().single()
 
-  if (dbError) {
-    // Cleanup orphaned storage file
-    await adminClient.storage.from("vehicle-media").remove([filePath])
-    return NextResponse.json(
-      { error: dbError.message },
-      { status: 500 }
-    )
-  }
+  if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
 
-  // Return with signed URL
-  const { data: signed } = await adminClient.storage
-    .from("vehicle-media")
-    .createSignedUrl(filePath, 3600)
-
-  return NextResponse.json(
-    { ...document, signed_url: signed?.signedUrl ?? null },
-    { status: 201 }
-  )
+  const signedUrl = await getSignedUrl(fileId, auth.tenantId, auth.userId)
+  return NextResponse.json({ ...document, signed_url: signedUrl }, { status: 201 })
 }

@@ -15,6 +15,8 @@ class QueryBuilder {
   private selectCols = "*"
   private orderByClause = ""
   private limitClause = ""
+  private rangeFrom = -1
+  private rangeTo = -1
   private isSingle = false
   private countOnly = false
   private withCount = false
@@ -129,6 +131,12 @@ class QueryBuilder {
     return this
   }
 
+  range(from: number, to: number) {
+    this.rangeFrom = from
+    this.rangeTo = to
+    return this
+  }
+
   single() {
     this.isSingle = true
     return this
@@ -144,9 +152,17 @@ class QueryBuilder {
         const result = await pool.query(sql, this.values)
         return { data: null, count: parseInt(result.rows[0]?.count ?? "0"), error: null }
       }
-      const sql = `SELECT ${this.selectCols} FROM ${this.schema}."${this.table}" ${where} ${this.orderByClause} ${this.limitClause}`.trim()
+      const paginationClause = this.rangeFrom >= 0
+        ? `LIMIT ${this.rangeTo - this.rangeFrom + 1} OFFSET ${this.rangeFrom}`
+        : this.limitClause
+      const sql = `SELECT ${this.selectCols} FROM ${this.schema}."${this.table}" ${where} ${this.orderByClause} ${paginationClause}`.trim()
       const result = await pool.query(sql, this.values)
-      const count = this.withCount ? (result.rowCount ?? result.rows.length) : undefined
+      let count: number | undefined
+      if (this.withCount) {
+        const countSql = `SELECT COUNT(*) FROM ${this.schema}."${this.table}" ${where}`.trim()
+        const countResult = await pool.query(countSql, this.values)
+        count = parseInt(countResult.rows[0]?.count ?? "0")
+      }
       if (this.isSingle) {
         return { data: result.rows[0] ?? null, count, error: null }
       }

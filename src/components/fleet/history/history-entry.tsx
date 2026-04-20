@@ -43,8 +43,9 @@ function formatDate(dateStr: string): string {
   })
 }
 
-function formatCurrency(value: number, currency: string | null): string {
-  return `${value.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency || "EUR"}`
+function formatCurrency(value: number | null | undefined, currency: string | null): string {
+  const n = parseFloat(String(value ?? 0)) || 0
+  return `${n.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency || "EUR"}`
 }
 
 // ---------------------------------------------------------------------------

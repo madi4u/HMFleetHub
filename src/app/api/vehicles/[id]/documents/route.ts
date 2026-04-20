@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { requirePermissionGuard } from "@/lib/auth-guard"
 import { createClient } from "@/lib/supabase/server"
-import { createAdminClient } from "@/lib/supabase/admin"
+import { uploadFile, getSignedUrl, isFilesServiceId } from "@/lib/files-service"
 
 const VALID_DOCUMENT_TYPES = [
   "REGISTRATION_CERTIFICATE",
@@ -87,14 +87,13 @@ export async function GET(
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  // Generate signed URLs
-  const adminClient = createAdminClient()
+  // Generate signed URLs via Files Service
   const enriched = await Promise.all(
     (docs ?? []).map(async (doc) => {
-      const { data: signed } = await adminClient.storage
-        .from("vehicle-media")
-        .createSignedUrl(doc.file_path, 3600)
-      return { ...doc, signed_url: signed?.signedUrl ?? null }
+      const signedUrl = isFilesServiceId(doc.file_path)
+        ? await getSignedUrl(doc.file_path, auth.tenantId, auth.userId)
+        : null
+      return { ...doc, signed_url: signedUrl }
     })
   )
 
@@ -171,47 +170,26 @@ export async function POST(
     )
   }
 
-  const sanitized = sanitizeFilename(file.name)
-  const filePath = `tenant/${auth.tenantId}/vehicles/${vehicleId}/documents/${Date.now()}-${sanitized}`
-
-  const adminClient = createAdminClient()
   const arrayBuffer = await file.arrayBuffer()
-  const { error: uploadError } = await adminClient.storage
-    .from("vehicle-media")
-    .upload(filePath, arrayBuffer, { contentType: file.type, upsert: false })
-
-  if (uploadError) {
-    return NextResponse.json({ error: uploadError.message }, { status: 500 })
-  }
+  const fileId = await uploadFile({
+    body: arrayBuffer, fileName: sanitizeFilename(file.name), mimeType: file.type,
+    orgId: auth.tenantId, userId: auth.userId,
+    sourceEntity: "vehicle", sourceEntityId: vehicleId,
+  })
 
   const { data: doc, error: dbError } = await supabase
     .from("vehicle_documents")
     .insert({
-      tenant_id: auth.tenantId,
-      vehicle_id: vehicleId,
-      file_path: filePath,
-      file_name: file.name,
-      mime_type: file.type,
-      file_size: file.size,
-      document_type: documentType,
-      attachment_type: attachmentType,
+      tenant_id: auth.tenantId, vehicle_id: vehicleId,
+      file_path: fileId, file_name: file.name,
+      mime_type: file.type, file_size: file.size,
+      document_type: documentType, attachment_type: attachmentType,
       description: description || null,
     })
-    .select()
-    .single()
+    .select().single()
 
-  if (dbError) {
-    // Clean up storage on DB failure
-    await adminClient.storage.from("vehicle-media").remove([filePath])
-    return NextResponse.json({ error: dbError.message }, { status: 500 })
-  }
+  if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
 
-  const { data: signed } = await adminClient.storage
-    .from("vehicle-media")
-    .createSignedUrl(filePath, 3600)
-
-  return NextResponse.json(
-    { ...doc, signed_url: signed?.signedUrl ?? null },
-    { status: 201 }
-  )
+  const signedUrl = await getSignedUrl(fileId, auth.tenantId, auth.userId)
+  return NextResponse.json({ ...doc, signed_url: signedUrl }, { status: 201 })
 }

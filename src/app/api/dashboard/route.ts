@@ -333,7 +333,7 @@ export async function GET() {
       const twelveMonthsAgo = new Date(currentYear, currentMonth - 11, 1)
 
       for (const e of entries) {
-        const gross = e.cost_gross
+        const gross = parseFloat(String(e.cost_gross)) || 0
         costTotal += gross
 
         const eventDate = new Date(e.event_date)
