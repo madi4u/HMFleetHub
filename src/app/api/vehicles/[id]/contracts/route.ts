@@ -3,6 +3,7 @@ import { z } from "zod"
 import { requirePermissionGuard } from "@/lib/auth-guard"
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { getSignedUrl, isFilesServiceId } from "@/lib/files-service"
 
 const contractSchema = z.object({
   contract_type: z.enum(["LEASING", "FINANCING", "PURCHASE"]),
@@ -74,15 +75,14 @@ export async function GET(
       .select("*")
       .in("contract_id", contractIds)
 
-    // Generate signed URLs
-    const adminClient = createAdminClient()
+    // Generate signed URLs via Files Service
     const enriched = await Promise.all(
       (documents ?? []).map(
         async (doc: { file_path: string; contract_id: string }) => {
-          const { data: signed } = await adminClient.storage
-            .from("vehicle-media")
-            .createSignedUrl(doc.file_path, 3600)
-          return { ...doc, signed_url: signed?.signedUrl ?? null }
+          const signedUrl = isFilesServiceId(doc.file_path)
+            ? await getSignedUrl(doc.file_path, auth.tenantId, auth.userId)
+            : null
+          return { ...doc, signed_url: signedUrl }
         }
       )
     )

@@ -2,8 +2,8 @@ import { NextResponse, type NextRequest } from "next/server"
 import { z } from "zod"
 import { requirePermissionGuard } from "@/lib/auth-guard"
 import { createClient } from "@/lib/supabase/server"
-import { createAdminClient } from "@/lib/supabase/admin"
 import { hasPermission } from "@/lib/permissions.config"
+import { deleteFile, isFilesServiceId } from "@/lib/files-service"
 
 const updateEntrySchema = z.object({
   entry_type: z
@@ -145,11 +145,11 @@ export async function DELETE(
 
   // Async storage cleanup (best effort)
   if (attachments && attachments.length > 0) {
-    const adminClient = createAdminClient()
-    const filePaths = attachments.map(
-      (a: { file_path: string }) => a.file_path
+    await Promise.all(
+      attachments
+        .filter((a: { file_path: string }) => isFilesServiceId(a.file_path))
+        .map((a: { file_path: string }) => deleteFile(a.file_path, auth.tenantId, auth.userId))
     )
-    await adminClient.storage.from("vehicle-media").remove(filePaths)
   }
 
   return new NextResponse(null, { status: 204 })

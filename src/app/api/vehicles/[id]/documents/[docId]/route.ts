@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { requirePermissionGuard } from "@/lib/auth-guard"
 import { createClient } from "@/lib/supabase/server"
-import { createAdminClient } from "@/lib/supabase/admin"
+import { deleteFile, isFilesServiceId } from "@/lib/files-service"
 
 export async function DELETE(
   _request: NextRequest,
@@ -38,8 +38,9 @@ export async function DELETE(
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  const adminClient = createAdminClient()
-  await adminClient.storage.from("vehicle-media").remove([doc.file_path])
+  if (isFilesServiceId(doc.file_path)) {
+    await deleteFile(doc.file_path, auth.tenantId, auth.userId)
+  }
 
   return new NextResponse(null, { status: 204 })
 }

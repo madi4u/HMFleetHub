@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { requirePermissionGuard } from "@/lib/auth-guard"
+import { getSignedUrl, isFilesServiceId } from "@/lib/files-service"
 import type { Vehicle, VehicleType, VehicleStatus, FuelType } from "@/types/database"
 
 // ---------------------------------------------------------------------------
@@ -105,13 +106,10 @@ export async function GET(
       )
     }
 
-    // Generate signed URL for vehicle photo if stored as a storage path
+    // Generate signed URL for vehicle photo via Files Service
     let signedImageUrl: string | null = vehicle.image_url ?? null
-    if (signedImageUrl && !signedImageUrl.startsWith("http")) {
-      const { data: signed } = await adminClient.storage
-        .from("vehicle-media")
-        .createSignedUrl(signedImageUrl, 3600)
-      signedImageUrl = signed?.signedUrl ?? null
+    if (signedImageUrl && isFilesServiceId(signedImageUrl)) {
+      signedImageUrl = await getSignedUrl(signedImageUrl, guard.tenantId, guard.userId)
     }
     const vehicleWithImage = { ...vehicle, image_url: signedImageUrl }
 

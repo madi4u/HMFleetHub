@@ -3,6 +3,7 @@ import { z } from "zod"
 import { requirePermissionGuard } from "@/lib/auth-guard"
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { deleteFile, isFilesServiceId } from "@/lib/files-service"
 
 const updateContractSchema = z.object({
   contract_type: z
@@ -108,10 +109,11 @@ export async function DELETE(
 
   // Storage cleanup (best effort)
   if (documents && documents.length > 0) {
-    const filePaths = documents.map(
-      (d: { file_path: string }) => d.file_path
+    await Promise.all(
+      documents
+        .filter((d: { file_path: string }) => isFilesServiceId(d.file_path))
+        .map((d: { file_path: string }) => deleteFile(d.file_path, auth.tenantId, auth.userId))
     )
-    await adminClient.storage.from("vehicle-media").remove(filePaths)
   }
 
   return new NextResponse(null, { status: 204 })
